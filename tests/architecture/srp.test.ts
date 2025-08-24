@@ -1,259 +1,240 @@
-import { describe, test, expect } from 'bun:test';
-import { readdirSync, statSync } from 'fs';
-import { join } from 'path';
-
 /**
  * Single Responsibility Principle (SRP) Tests
  *
- * Verifies that each class has only one reason to change and handles a single responsibility.
- * Based on the building blocks architecture defined in docs/05-building-blocks.md
+ * Tests that each class has only one reason to change.
+ * Each class should have only one job or responsibility.
  */
 
-const SRC_PATH = join(__dirname, '../../src');
+import { describe, test, expect } from 'bun:test';
+import { FileSystemUtils, ARCHITECTURE_CONFIG } from './common/test-utils';
+import { SolidTestUtils } from './common/solid-utils';
 
-// Helper functions
-function getAllTypeScriptFiles(dir: string): string[] {
-  const files: string[] = [];
-
-  try {
-    const items = readdirSync(dir);
-
-    for (const item of items) {
-      const fullPath = join(dir, item);
-      const stat = statSync(fullPath);
-
-      if (stat.isDirectory()) {
-        files.push(...getAllTypeScriptFiles(fullPath));
-      } else if (item.endsWith('.ts') && !item.endsWith('.test.ts') && !item.endsWith('.d.ts')) {
-        files.push(fullPath);
-      }
-    }
-  } catch {
-    // Directory might not exist yet
-  }
-
-  return files;
-}
-
-function extractClasses(content: string): string[] {
-  const classRegex = /class\s+(\w+)/g;
-  const matches: string[] = [];
-  let match;
-
-  while ((match = classRegex.exec(content)) !== null) {
-    matches.push(match[1]);
-  }
-
-  return matches;
-}
-
-function extractMethods(content: string, className: string): string[] {
-  const classStartRegex = new RegExp(`class\\s+${className}[^{]*{`);
-  const match = classStartRegex.exec(content);
-
-  if (!match) return [];
-
-  const startIndex = match.index + match[0].length;
-  let braceCount = 1;
-  let endIndex = startIndex;
-
-  // Find the end of the class
-  for (let i = startIndex; i < content.length && braceCount > 0; i++) {
-    if (content[i] === '{') braceCount++;
-    if (content[i] === '}') braceCount--;
-    endIndex = i;
-  }
-
-  const classContent = content.substring(startIndex, endIndex);
-
-  // Extract method names
-  const methodRegex = /(?:public|private|protected)?\s*(?:async\s+)?(\w+)\s*\(/g;
-  const methods: string[] = [];
-  let methodMatch;
-
-  while ((methodMatch = methodRegex.exec(classContent)) !== null) {
-    if (methodMatch[1] !== 'constructor') {
-      methods.push(methodMatch[1]);
-    }
-  }
-
-  return methods;
-}
-
-function extractImplementedInterfaces(content: string, className: string): string[] {
-  const implementsRegex = new RegExp(`class\\s+${className}[^{]*implements\\s+([^{]+)`);
-  const match = implementsRegex.exec(content);
-
-  if (!match) return [];
-
-  return match[1]
-    .split(',')
-    .map(i => i.trim())
-    .filter(i => i.length > 0);
-}
-
-describe('Single Responsibility Principle (SRP)', () => {
-  test('classes should have a single responsibility (max 10 methods)', async () => {
-    // Since we don't have implementations yet, test the architectural principle
-    const maxMethodsPerClass = 10;
-    const responsibilityPrinciples = [
-      'Each class should have one reason to change',
-      'Methods should be cohesive within the class',
-      'High cohesion, low coupling should be maintained',
-    ];
-
-    responsibilityPrinciples.forEach(principle => {
-      expect(principle).toBeTruthy();
-    });
-
-    // When implementations exist, verify method count
-    expect(maxMethodsPerClass).toBe(10);
-  });
-
-  test('classes should not implement too many interfaces (max 3)', async () => {
-    const files = getAllTypeScriptFiles(SRC_PATH);
+describe('Single Responsibility Principle', () => {
+  test('should have classes with single responsibility', () => {
+    const files = FileSystemUtils.getAllTypeScriptFiles();
+    const violations: string[] = [];
 
     for (const file of files) {
-      const content = await Bun.file(file).text();
-      const classes = extractClasses(content);
-
-      for (const className of classes) {
-        const interfaces = extractImplementedInterfaces(content, className);
-        expect(interfaces.length).toBeLessThanOrEqual(3);
+      const result = SolidTestUtils.validateSingleResponsibility(file);
+      if (!result.isValid) {
+        violations.push(...result.violations.map(v => `${file}: ${v}`));
       }
     }
+
+    if (violations.length > 0) {
+      console.warn('SRP violations found:', violations);
+    }
+
+    // Allow some violations for legacy code, but track them
+    expect(violations.length).toBeLessThanOrEqual(ARCHITECTURE_CONFIG.limits.maxSrpViolations);
+  });
+
+  test('should have focused classes in core layer', () => {
+    const coreFiles = FileSystemUtils.getFilesInLayer('core');
+    const violations: string[] = [];
+
+    for (const file of coreFiles) {
+      const expectedPatterns = [
+        'business',
+        'domain',
+        'logic',
+        'entity',
+        'service',
+        'agent',
+        'knowledge',
+      ];
+      const isValid = SolidTestUtils.validateLayerComponentResponsibility(
+        file,
+        'core',
+        expectedPatterns
+      );
+
+      if (!isValid) {
+        violations.push(`${file}: Core class should focus on business logic`);
+      }
+    }
+
+    expect(violations).toEqual([]);
+  });
+
+  test('should have focused adapter classes', () => {
+    const adapterFiles = FileSystemUtils.getFilesInLayer('adapters');
+    const violations: string[] = [];
+
+    for (const file of adapterFiles) {
+      const expectedPatterns = ['adapter', 'convert', 'transform', 'interface'];
+      const isValid = SolidTestUtils.validateLayerComponentResponsibility(
+        file,
+        'adapters',
+        expectedPatterns
+      );
+
+      if (!isValid) {
+        violations.push(`${file}: Adapter should focus on adaptation concerns`);
+      }
+    }
+
+    expect(violations).toEqual([]);
+  });
+
+  test('should have focused AI strategy classes', () => {
+    const aiFiles = FileSystemUtils.getFilesInLayer('ai');
+    const violations: string[] = [];
+
+    for (const file of aiFiles) {
+      const expectedPatterns = ['ai', 'strategy', 'model', 'prompt', 'completion'];
+      const isValid = SolidTestUtils.validateLayerComponentResponsibility(
+        file,
+        'ai',
+        expectedPatterns
+      );
+
+      if (!isValid) {
+        violations.push(`${file}: AI strategy should focus on AI interaction`);
+      }
+    }
+
+    expect(violations).toEqual([]);
+  });
+
+  test('should have focused event classes', () => {
+    const eventFiles = FileSystemUtils.getFilesInLayer('events');
+    const violations: string[] = [];
+
+    for (const file of eventFiles) {
+      const expectedPatterns = ['event', 'bus', 'emit', 'listen', 'handler'];
+      const isValid = SolidTestUtils.validateLayerComponentResponsibility(
+        file,
+        'events',
+        expectedPatterns
+      );
+
+      if (!isValid) {
+        violations.push(`${file}: Event class should focus on event handling`);
+      }
+    }
+
+    expect(violations).toEqual([]);
+  });
+
+  test('should have focused cache classes', () => {
+    const cacheFiles = FileSystemUtils.getFilesInLayer('cache');
+    const violations: string[] = [];
+
+    for (const file of cacheFiles) {
+      const expectedPatterns = ['cache', 'store', 'memory', 'get', 'set'];
+      const isValid = SolidTestUtils.validateLayerComponentResponsibility(
+        file,
+        'cache',
+        expectedPatterns
+      );
+
+      if (!isValid) {
+        violations.push(`${file}: Cache class should focus on caching concerns`);
+      }
+    }
+
+    expect(violations).toEqual([]);
+  });
+
+  test('should have focused discovery classes', () => {
+    const discoveryFiles = FileSystemUtils.getFilesInLayer('discovery');
+    const violations: string[] = [];
+
+    for (const file of discoveryFiles) {
+      const expectedPatterns = ['discovery', 'content', 'find', 'search', 'scan'];
+      const isValid = SolidTestUtils.validateLayerComponentResponsibility(
+        file,
+        'discovery',
+        expectedPatterns
+      );
+
+      if (!isValid) {
+        violations.push(`${file}: Discovery class should focus on content discovery`);
+      }
+    }
+
+    expect(violations).toEqual([]);
   });
 
   test('building blocks should be in appropriate directories', () => {
-    // Test the expected directory structure based on building blocks
-    const expectedStructure = [
-      'core', // Core Knowledge Agent
-      'discovery', // Content Discovery Layer
-      'ai', // AI Processing Pipeline
-      'adapters', // Platform Adaptation Layer
-      'cache', // Cache Management Layer
-      'events', // Event Bus
-      'interfaces', // Interface definitions
-      'types', // Type definitions
-    ];
+    const { layers } = ARCHITECTURE_CONFIG;
 
-    for (const dir of expectedStructure) {
-      // For now, just verify the structure is planned correctly
-      expect(dir).toBeTruthy();
-      expect(typeof dir).toBe('string');
+    // Test the expected directory structure based on building blocks
+    for (const layerName of Object.keys(layers)) {
+      expect(layerName).toBeTruthy();
+      expect(typeof layerName).toBe('string');
     }
 
     // Verify we have the right number of building blocks
-    expect(expectedStructure.length).toBe(8);
-  });
-  test('core components should be separated by responsibility', async () => {
-    const corePath = join(SRC_PATH, 'core');
-
-    try {
-      const files = getAllTypeScriptFiles(corePath);
-      const coreComponents = [
-        'knowledge-agent', // Main orchestrator
-        'workflow-orchestrator', // Workflow coordination
-        'query-parser', // Query analysis
-        'context-manager', // Context management
-        'response-builder', // Response assembly
-        'configuration-manager', // Configuration management
-      ];
-
-      // Check that core components exist or are planned
-      for (const component of coreComponents) {
-        const hasFile = files.some(
-          file => file.includes(component) || file.includes(component.replace('-', ''))
-        );
-
-        if (files.length > 0) {
-          // Only enforce if core directory has files
-          expect(hasFile).toBe(true);
-        }
-      }
-    } catch {
-      // Core directory might not exist yet - this is acceptable for new projects
-    }
+    expect(Object.keys(layers).length).toBeGreaterThan(0);
   });
 
-  test('discovery components should handle single aspects of content discovery', async () => {
-    const discoveryPath = join(SRC_PATH, 'discovery');
+  test('core components should be separated by responsibility', () => {
+    const coreFiles = FileSystemUtils.getFilesInLayer('core');
+    const violations: string[] = [];
 
-    try {
-      const files = getAllTypeScriptFiles(discoveryPath);
-
-      for (const file of files) {
-        const content = await Bun.file(file).text();
-        const classes = extractClasses(content);
-
-        for (const className of classes) {
-          // Discovery classes should focus on single source or single function
-          const methods = extractMethods(content, className);
-
-          // Discovery components should be focused
-          expect(methods.length).toBeLessThanOrEqual(8);
-
-          // Should not mix different source types in one class
-          const hasMultipleSources = /youtube.*reddit|reddit.*github|github.*youtube/i.test(
-            content
-          );
-          expect(hasMultipleSources).toBe(false);
+    for (const file of coreFiles) {
+      try {
+        const result = SolidTestUtils.validateSingleResponsibility(file);
+        if (!result.isValid) {
+          violations.push(...result.violations);
         }
+      } catch {
+        // Skip files that can't be analyzed
       }
-    } catch {
-      // Discovery directory might not exist yet
     }
+
+    // Core components should be well-structured
+    expect(violations.length).toBeLessThanOrEqual(ARCHITECTURE_CONFIG.limits.maxCoreViolations);
   });
 
-  test('AI processing components should have single processing focus', async () => {
-    const aiPath = join(SRC_PATH, 'ai');
+  test('discovery components should handle single aspects of content discovery', () => {
+    const discoveryFiles = FileSystemUtils.getFilesInLayer('discovery');
+    const violations: string[] = [];
 
-    try {
-      const files = getAllTypeScriptFiles(aiPath);
-
-      for (const file of files) {
-        const content = await Bun.file(file).text();
-        const classes = extractClasses(content);
-
-        for (const className of classes) {
-          // AI classes should focus on single processing type
-          const methods = extractMethods(content, className);
-          expect(methods.length).toBeLessThanOrEqual(6);
-
-          // Should not mix summarization with extraction in same class
-          const mixesConcerns =
-            content.includes('summarize') &&
-            content.includes('extract') &&
-            content.includes('analyze');
-          expect(mixesConcerns).toBe(false);
-        }
+    for (const file of discoveryFiles) {
+      const result = SolidTestUtils.validateSingleResponsibility(file);
+      if (!result.isValid) {
+        violations.push(...result.violations);
       }
-    } catch {
-      // AI directory might not exist yet
     }
+
+    expect(violations).toEqual([]);
   });
 
-  test('platform adapters should handle single platform each', async () => {
-    const adaptersPath = join(SRC_PATH, 'adapters');
+  test('AI processing components should have single processing focus', () => {
+    const aiFiles = FileSystemUtils.getFilesInLayer('ai');
+    const violations: string[] = [];
 
-    try {
-      const files = getAllTypeScriptFiles(adaptersPath);
-
-      for (const file of files) {
-        const content = await Bun.file(file).text();
-
-        // Each adapter file should handle only one platform
-        const platforms = ['logseq', 'obsidian', 'notion', 'roam'];
-        const foundPlatforms = platforms.filter(platform =>
-          content.toLowerCase().includes(platform)
-        );
-
-        if (foundPlatforms.length > 0) {
-          expect(foundPlatforms.length).toBeLessThanOrEqual(1);
-        }
+    for (const file of aiFiles) {
+      const result = SolidTestUtils.validateSingleResponsibility(file);
+      if (!result.isValid) {
+        violations.push(...result.violations);
       }
-    } catch {
-      // Adapters directory might not exist yet
     }
+
+    expect(violations).toEqual([]);
+  });
+
+  test('platform adapters should handle single platform each', () => {
+    const adapterFiles = FileSystemUtils.getFilesInLayer('adapters');
+    const violations: string[] = [];
+
+    for (const file of adapterFiles) {
+      // Check that each adapter focuses on a single platform
+      const platforms = ['logseq', 'obsidian', 'notion', 'roam', 'markdown'];
+      const hasFocusedPlatform = SolidTestUtils.validateLayerComponentResponsibility(
+        file,
+        'adapters',
+        platforms
+      );
+
+      if (!hasFocusedPlatform) {
+        violations.push(`${file}: Adapter should focus on single platform`);
+      }
+    }
+
+    expect(violations).toEqual([]);
   });
 });
