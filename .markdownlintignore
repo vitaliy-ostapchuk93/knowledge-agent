@@ -1,0 +1,8 @@
+LICENSE
+LICENSE.md
+LICENSE.txt
+node*modules/
+dist/
+build/
+*.min.js
+\_.min.css
