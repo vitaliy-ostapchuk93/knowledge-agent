@@ -1,0 +1,87 @@
+{
+  "extends": [
+    "@typescript-eslint/recommended",
+    "@typescript-eslint/recommended-requiring-type-checking"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint"],
+  "rules": {
+    // Code quality
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { "argsIgnorePattern": "^_" }
+    ],
+    "@typescript-eslint/explicit-function-return-type": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/prefer-readonly": "error",
+    "@typescript-eslint/prefer-nullish-coalescing": "error",
+    "@typescript-eslint/prefer-optional-chain": "error",
+
+    // Naming conventions
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "interface",
+        "format": ["PascalCase"],
+        "prefix": ["I"]
+      },
+      {
+        "selector": "typeAlias",
+        "format": ["PascalCase"]
+      },
+      {
+        "selector": "enum",
+        "format": ["PascalCase"]
+      },
+      {
+        "selector": "enumMember",
+        "format": ["UPPER_CASE"]
+      },
+      {
+        "selector": "class",
+        "format": ["PascalCase"]
+      },
+      {
+        "selector": "method",
+        "format": ["camelCase"]
+      },
+      {
+        "selector": "property",
+        "format": ["camelCase"]
+      },
+      {
+        "selector": "variable",
+        "format": ["camelCase", "UPPER_CASE"],
+        "leadingUnderscore": "allow"
+      }
+    ],
+
+    // Best practices
+    "prefer-const": "error",
+    "no-var": "error",
+    "no-console": "warn",
+    "eqeqeq": "error",
+    "curly": "error",
+
+    // Documentation
+    "@typescript-eslint/prefer-readonly-parameter-types": "off",
+    "valid-jsdoc": [
+      "warn",
+      {
+        "requireReturn": false,
+        "requireParamDescription": false,
+        "requireReturnDescription": false
+      }
+    ]
+  },
+  "env": {
+    "node": true,
+    "es2022": true
+  },
+  "ignorePatterns": ["dist/", "node_modules/", "**/*.js", "**/*.d.ts"]
+}

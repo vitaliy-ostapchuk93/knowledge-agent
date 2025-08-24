@@ -12,24 +12,28 @@
   "endOfLine": "lf",
   "overrides": [
     {
-      "files": ["*.ts", "*.tsx"],
+      "files": [
+        "*.ts",
+        "*.tsx"
+      ],
       "options": {
         "parser": "typescript"
       }
     },
     {
-      "files": ["*.md"],
+      "files": [
+        "*.md"
+      ],
       "options": {
-        "parser": "markdown",
-        "printWidth": 80,
-        "proseWrap": "always"
+        "parser": "markdown"
       }
     },
     {
-      "files": ["*.json"],
+      "files": [
+        "*.json"
+      ],
       "options": {
-        "parser": "json",
-        "printWidth": 80
+        "parser": "json"
       }
     }
   ]
