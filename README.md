@@ -336,6 +336,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
+> I'd really appreciate your support. [Buy Vitaliy Ostapchuk a coffee a coffee ☕](https://buymeacoffee.com/vitaliy.ostapchuk).
+
+![coffee](/assets/bmc_qr_small.png)
+
 Universal Knowledge Agent is inspired by and builds upon the excellent work of knowledge management pioneers:
 
 - **[Logseq](https://logseq.com/)** - For demonstrating the power of local-first, block-based knowledge graphs
