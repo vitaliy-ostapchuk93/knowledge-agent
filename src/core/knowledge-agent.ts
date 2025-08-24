@@ -149,11 +149,13 @@ export class KnowledgeAgent implements IKnowledgeAgent {
 
       // Content discovery for MVP
       let mockContent: ContentItem[] = [];
+      let discoverySearchTime = 0;
 
       if (this.contentDiscovery) {
         // Use injected mock content discovery
         const result = await this.contentDiscovery.searchContent(searchOptions);
         mockContent = result.items;
+        discoverySearchTime = result.searchTime;
       } else {
         // Fallback to inline mock data
         mockContent = [
@@ -176,12 +178,15 @@ export class KnowledgeAgent implements IKnowledgeAgent {
             timestamp: new Date(),
           },
         ];
+        discoverySearchTime = Date.now() - startTime;
       }
+
+      const totalSearchTime = Math.max(Date.now() - startTime, discoverySearchTime);
 
       const result: ContentResult = {
         items: mockContent,
         totalFound: mockContent.length,
-        searchTime: Date.now() - startTime,
+        searchTime: totalSearchTime,
         sources: [ContentSource.DOCUMENTATION, ContentSource.TECH_BLOG],
       };
 

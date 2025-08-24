@@ -42,6 +42,9 @@ describe('Single Responsibility Principle', () => {
         'service',
         'agent',
         'knowledge',
+        'monitor', // File system monitoring is core functionality
+        'filesystem',
+        'watch',
       ];
       const isValid = SolidTestUtils.validateLayerComponentResponsibility(
         file,

@@ -21,7 +21,19 @@
     "noEmit": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": false,
-    "types": ["bun-types", "node"]
+    "types": ["bun-types", "node"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@/types": ["src/types"],
+      "@/interfaces": ["src/interfaces"],
+      "@/core/*": ["src/core/*"],
+      "@/adapters/*": ["src/adapters/*"],
+      "@/ai/*": ["src/ai/*"],
+      "@/cache/*": ["src/cache/*"],
+      "@/discovery/*": ["src/discovery/*"],
+      "@/events/*": ["src/events/*"]
+    }
   },
   "include": ["src/**/*", "tests/**/*", "*.ts", "*.js"],
   "exclude": ["node_modules", "dist"]
