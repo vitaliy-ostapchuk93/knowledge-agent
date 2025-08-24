@@ -1,0 +1,32 @@
+# Bun configuration file
+[install]
+# Configure package manager behavior
+cache = true
+auto = "fallback"
+production = false
+optional = true
+dev = true
+peer = false
+frozenLockfile = false
+
+[install.lockfile]
+# Save exact versions for better reproducibility
+save = "exact"
+print = "yarn"
+
+[test]
+# Test configuration
+preload = ["./src/test-setup.ts"]
+timeout = 5000
+bail = 0
+
+[run]
+# Runtime configuration
+bun = true
+silent = false
+
+# Registry configuration
+[install.registry]
+url = "https://registry.npmjs.org"
+token = ""
+username = ""
