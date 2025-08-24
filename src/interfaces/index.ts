@@ -20,7 +20,7 @@ import {
   PluginOutput,
   ProcessingStrategy,
   RelatedLink,
-} from '../types';
+} from '@/types';
 
 // Facade Pattern - Simplifying Complex Operations (Usability Goal)
 export interface IKnowledgeAgent {

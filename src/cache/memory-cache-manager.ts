@@ -3,7 +3,7 @@
  * Provides basic caching functionality with TTL support
  */
 
-import { ICacheManager } from '../interfaces/index.js';
+import { ICacheManager } from '@/interfaces/index.js';
 
 interface ICacheEntry<T> {
   value: T;
@@ -73,7 +73,7 @@ export class MemoryCacheManager implements ICacheManager {
       createdAt: Date.now(),
     };
 
-    // If cache is at max size, remove oldest entry
+    // If cache is at max size and we're adding a new key, remove oldest entry
     if (this.cache.size >= this.maxSize && !this.cache.has(key)) {
       this.evictOldest();
     }
@@ -157,7 +157,7 @@ export class MemoryCacheManager implements ICacheManager {
    */
   private evictOldest(): void {
     let oldestKey: string | null = null;
-    let oldestTime = Date.now();
+    let oldestTime = Number.MAX_SAFE_INTEGER;
 
     for (const [key, entry] of this.cache.entries()) {
       if (entry.createdAt < oldestTime) {

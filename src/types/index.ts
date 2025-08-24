@@ -15,6 +15,17 @@ export interface ContentItem {
   timestamp: Date;
 }
 
+export interface DiscoveredContent {
+  id: string;
+  title: string;
+  content: string;
+  source: ContentSource;
+  url?: string;
+  metadata: Record<string, unknown>;
+  relevanceScore: number;
+  tags: string[];
+}
+
 export interface ContentMetadata {
   author?: string;
   publishDate?: Date;
@@ -34,6 +45,8 @@ export enum ContentSource {
   TECH_BLOG = 'tech_blog',
   ACADEMIC_PAPER = 'academic_paper',
   TUTORIAL = 'tutorial',
+  WEB = 'web',
+  LOCAL_FILE = 'local_file',
 }
 
 export enum ContentType {
@@ -56,6 +69,13 @@ export interface SearchOptions {
   includeCode?: boolean;
   language?: string;
   summaryStrategy?: SummaryStrategy;
+}
+
+export interface DiscoveryOptions {
+  sources?: ContentSource[];
+  maxResults?: number;
+  minRelevanceScore?: number;
+  strategy?: 'comprehensive' | 'fast' | 'deep';
 }
 
 export interface DateRange {
@@ -97,6 +117,14 @@ export interface RelatedLink {
   url: string;
   description: string;
   relationship: 'prerequisite' | 'related' | 'advanced' | 'alternative';
+}
+
+export interface AIProcessingResult {
+  summary: Summary;
+  analysis: Analysis;
+  recommendations: string[];
+  confidence: number;
+  processingTime: number;
 }
 
 // Platform Types
@@ -157,6 +185,14 @@ export interface ProcessingOptions {
   temperature?: number;
   model?: string;
   useCache?: boolean;
+}
+
+export interface ProcessingConfig {
+  provider: 'openai' | 'anthropic' | 'local';
+  model: string;
+  maxTokens: number;
+  temperature: number;
+  apiKey?: string;
 }
 
 export enum ProcessingStrategy {

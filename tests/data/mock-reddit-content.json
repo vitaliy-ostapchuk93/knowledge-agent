@@ -1,0 +1,113 @@
+[
+  {
+    "id": "reddit-react-discussion-1",
+    "title": "React 18 Concurrent Features - Performance Impact Discussion",
+    "content": "Community discussion about React 18's concurrent features and their real-world performance impact. Users share benchmarks, migration experiences, and best practices for adopting concurrent rendering.",
+    "source": "reddit",
+    "url": "https://www.reddit.com/r/reactjs/comments/abc123/react_18_concurrent_features/",
+    "metadata": {
+      "subreddit": "reactjs",
+      "postId": "abc123",
+      "author": "react_dev_2025",
+      "score": 1250,
+      "commentCount": 180,
+      "createdAt": "2025-08-22T14:30:00Z",
+      "flair": "Discussion",
+      "isStickied": false,
+      "isLocked": false,
+      "awards": 5,
+      "contentType": "discussion"
+    },
+    "relevanceScore": 0.89,
+    "tags": ["reddit", "discussion", "reactjs", "react-18", "performance"]
+  },
+  {
+    "id": "reddit-typescript-help-1",
+    "title": "TypeScript Generic Constraints - Need Help Understanding",
+    "content": "Help thread where experienced TypeScript developers explain generic constraints, conditional types, and advanced type manipulation. Includes multiple code examples and explanations.",
+    "source": "reddit",
+    "url": "https://www.reddit.com/r/typescript/comments/def456/generic_constraints_help/",
+    "metadata": {
+      "subreddit": "typescript",
+      "postId": "def456",
+      "author": "typescript_learner",
+      "score": 890,
+      "commentCount": 120,
+      "createdAt": "2025-08-21T09:15:00Z",
+      "flair": "Help",
+      "isStickied": false,
+      "isLocked": false,
+      "awards": 3,
+      "contentType": "discussion"
+    },
+    "relevanceScore": 0.92,
+    "tags": ["reddit", "discussion", "typescript", "generics", "help"]
+  },
+  {
+    "id": "reddit-nodejs-performance-1",
+    "title": "Node.js Memory Leaks - Debugging and Prevention Strategies",
+    "content": "Comprehensive discussion about Node.js memory leaks including detection tools, common causes, and prevention strategies. Community shares real-world debugging experiences and solutions.",
+    "source": "reddit",
+    "url": "https://www.reddit.com/r/node/comments/ghi789/nodejs_memory_leaks_debugging/",
+    "metadata": {
+      "subreddit": "node",
+      "postId": "ghi789",
+      "author": "backend_expert",
+      "score": 2100,
+      "commentCount": 340,
+      "createdAt": "2025-08-20T16:45:00Z",
+      "flair": "Tutorial",
+      "isStickied": true,
+      "isLocked": false,
+      "awards": 12,
+      "contentType": "discussion"
+    },
+    "relevanceScore": 0.95,
+    "tags": ["reddit", "discussion", "node", "performance", "debugging"]
+  },
+  {
+    "id": "reddit-webdev-trends-1",
+    "title": "Web Development Trends 2025 - What's Hot and What's Not",
+    "content": "Annual discussion thread about web development trends. Community discusses frameworks, tools, and technologies that are gaining or losing popularity in 2025.",
+    "source": "reddit",
+    "url": "https://www.reddit.com/r/webdev/comments/jkl012/webdev_trends_2025/",
+    "metadata": {
+      "subreddit": "webdev",
+      "postId": "jkl012",
+      "author": "web_trends_analyst",
+      "score": 3500,
+      "commentCount": 680,
+      "createdAt": "2025-08-19T11:20:00Z",
+      "flair": "Discussion",
+      "isStickied": false,
+      "isLocked": false,
+      "awards": 25,
+      "contentType": "discussion"
+    },
+    "relevanceScore": 0.88,
+    "tags": ["reddit", "discussion", "webdev", "trends", "2025"]
+  },
+  {
+    "id": "reddit-programming-advice-1",
+    "title": "Best Resources for Learning System Design - Community Recommendations",
+    "content": "Community-curated list of the best resources for learning system design including books, courses, blogs, and practical exercises. Includes both free and paid resources with detailed reviews.",
+    "source": "reddit",
+    "url": "https://www.reddit.com/r/programming/comments/mno345/system_design_resources/",
+    "metadata": {
+      "subreddit": "programming",
+      "postId": "mno345",
+      "author": "system_design_guru",
+      "score": 4200,
+      "commentCount": 520,
+      "createdAt": "2025-08-18T08:30:00Z",
+      "flair": "Resource",
+      "isStickied": false,
+      "isLocked": false,
+      "awards": 18,
+      "contentType": "discussion"
+    },
+    "relevanceScore": 0.91,
+    "tags": ["reddit", "discussion", "programming", "system-design", "resources"]
+  }
+]
+

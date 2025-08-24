@@ -1,0 +1,103 @@
+[
+  {
+    "id": "stackoverflow-react-hooks-1",
+    "title": "When to use useEffect vs useLayoutEffect in React?",
+    "content": "Detailed explanation of the differences between useEffect and useLayoutEffect hooks in React. Includes examples of when to use each one, performance implications, and common pitfalls to avoid.",
+    "source": "stackoverflow",
+    "url": "https://stackoverflow.com/questions/useeffect-vs-uselayouteffect",
+    "metadata": {
+      "questionId": "12345678",
+      "author": "react_developer",
+      "score": 450,
+      "answerCount": 8,
+      "viewCount": 125000,
+      "createdAt": "2025-08-20T10:30:00Z",
+      "acceptedAnswer": true,
+      "tags": ["react", "hooks", "useeffect", "uselayouteffect"],
+      "contentType": "question"
+    },
+    "relevanceScore": 0.94,
+    "tags": ["stackoverflow", "question", "react", "hooks", "useeffect"]
+  },
+  {
+    "id": "stackoverflow-typescript-generics-1",
+    "title": "How to create a generic type that extends multiple interfaces in TypeScript?",
+    "content": "Question about creating complex generic types in TypeScript that extend multiple interfaces. Includes multiple answers with different approaches, use cases, and best practices.",
+    "source": "stackoverflow",
+    "url": "https://stackoverflow.com/questions/typescript-generic-multiple-interfaces",
+    "metadata": {
+      "questionId": "23456789",
+      "author": "ts_learner",
+      "score": 320,
+      "answerCount": 12,
+      "viewCount": 89000,
+      "createdAt": "2025-08-18T14:15:00Z",
+      "acceptedAnswer": true,
+      "tags": ["typescript", "generics", "interfaces", "types"],
+      "contentType": "question"
+    },
+    "relevanceScore": 0.91,
+    "tags": ["stackoverflow", "question", "typescript", "generics", "interfaces"]
+  },
+  {
+    "id": "stackoverflow-nodejs-async-1",
+    "title": "Node.js async/await error handling best practices",
+    "content": "Comprehensive discussion about error handling patterns in Node.js when using async/await. Covers try-catch blocks, promise rejection handling, and error propagation strategies.",
+    "source": "stackoverflow",
+    "url": "https://stackoverflow.com/questions/nodejs-async-error-handling",
+    "metadata": {
+      "questionId": "34567890",
+      "author": "nodejs_dev",
+      "score": 680,
+      "answerCount": 15,
+      "viewCount": 234000,
+      "createdAt": "2025-08-15T09:45:00Z",
+      "acceptedAnswer": true,
+      "tags": ["nodejs", "async-await", "error-handling", "javascript"],
+      "contentType": "question"
+    },
+    "relevanceScore": 0.96,
+    "tags": ["stackoverflow", "question", "nodejs", "async", "error-handling"]
+  },
+  {
+    "id": "stackoverflow-docker-optimization-1",
+    "title": "Docker image optimization techniques for Node.js applications",
+    "content": "Question about optimizing Docker images for Node.js applications. Answers cover multi-stage builds, layer caching, security best practices, and size reduction techniques.",
+    "source": "stackoverflow",
+    "url": "https://stackoverflow.com/questions/docker-nodejs-optimization",
+    "metadata": {
+      "questionId": "45678901",
+      "author": "devops_engineer",
+      "score": 520,
+      "answerCount": 10,
+      "viewCount": 156000,
+      "createdAt": "2025-08-12T16:20:00Z",
+      "acceptedAnswer": true,
+      "tags": ["docker", "nodejs", "optimization", "devops"],
+      "contentType": "question"
+    },
+    "relevanceScore": 0.88,
+    "tags": ["stackoverflow", "question", "docker", "nodejs", "optimization"]
+  },
+  {
+    "id": "stackoverflow-database-design-1",
+    "title": "SQL vs NoSQL: When to choose which database type?",
+    "content": "In-depth discussion about choosing between SQL and NoSQL databases. Covers use cases, scalability considerations, ACID properties, and real-world examples from different industries.",
+    "source": "stackoverflow",
+    "url": "https://stackoverflow.com/questions/sql-vs-nosql-choice",
+    "metadata": {
+      "questionId": "56789012",
+      "author": "database_architect",
+      "score": 890,
+      "answerCount": 20,
+      "viewCount": 345000,
+      "createdAt": "2025-08-10T11:10:00Z",
+      "acceptedAnswer": true,
+      "tags": ["database", "sql", "nosql", "architecture"],
+      "contentType": "question"
+    },
+    "relevanceScore": 0.85,
+    "tags": ["stackoverflow", "question", "database", "sql", "nosql"]
+  }
+]
+

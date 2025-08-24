@@ -4,13 +4,13 @@
  */
 
 import {
-  ContentItem,
   ContentSource,
-  ContentType,
-  ContentResult,
+  ContentItem,
   SearchOptions,
-} from '../types/index.js';
-import { IContentDiscovery } from '../interfaces/index.js';
+  ContentResult,
+  ContentType,
+} from '@/types/index.js';
+import { IContentDiscovery } from '@/interfaces/index.js';
 
 export class MockContentDiscovery implements IContentDiscovery {
   private mockDatabase: ContentItem[] = [];

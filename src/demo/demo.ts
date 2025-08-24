@@ -3,13 +3,13 @@
  * Demonstrates the core functionality with a practical example - NO API KEYS REQUIRED
  */
 
-import { KnowledgeAgent } from '../core/knowledge-agent.js';
-import { MarkdownAdapter } from '../adapters/markdown-adapter.js';
-import { MockAIStrategy } from '../ai/mock-ai-strategy.js';
-import { MockContentDiscovery } from '../discovery/mock-content-discovery.js';
-import { MemoryCacheManager } from '../cache/memory-cache-manager.js';
-import { SimpleEventBus } from '../events/simple-event-bus.js';
-import { PlatformType, SummaryStrategy } from '../types/index.js';
+import { KnowledgeAgent } from '@/core/knowledge-agent.js';
+import { MarkdownAdapter } from '@/adapters/markdown-adapter.js';
+import { MockAIStrategy } from '@/ai/mock-ai-strategy.js';
+import { MockContentDiscovery } from '@/discovery/mock-content-discovery.js';
+import { MemoryCacheManager } from '@/cache/memory-cache-manager.js';
+import { SimpleEventBus } from '@/events/simple-event-bus.js';
+import { PlatformType, SummaryStrategy } from '@/types/index.js';
 import path from 'path';
 import { promises as fs } from 'fs';
 

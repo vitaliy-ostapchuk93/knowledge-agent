@@ -3,15 +3,15 @@
  * Handles AI-powered content summarization and analysis using OpenAI's API
  */
 
-import { IProcessingStrategy } from '../interfaces/index.js';
+import { IProcessingStrategy } from '@/interfaces/index.js';
 import {
+  Summary,
   ProcessingStrategy,
   ProcessingOptions,
-  Summary,
   Analysis,
   CodeExample,
   RelatedLink,
-} from '../types/index.js';
+} from '@/types/index.js';
 import OpenAI from 'openai';
 
 export class OpenAIStrategy implements IProcessingStrategy {

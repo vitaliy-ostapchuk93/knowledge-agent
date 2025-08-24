@@ -1,0 +1,108 @@
+[
+  {
+    "id": "youtube-react-hooks-tutorial-1",
+    "title": "React Hooks Complete Tutorial 2025",
+    "content": "Complete React Hooks tutorial covering useState, useEffect, useContext, useReducer, and custom hooks. Includes practical projects and common patterns. Perfect for beginners and intermediate developers.",
+    "source": "youtube",
+    "url": "https://www.youtube.com/watch?v=O6P86uwfdR0",
+    "metadata": {
+      "channel": "React Mastery",
+      "duration": "45:30",
+      "videoId": "O6P86uwfdR0",
+      "uploadDate": "2025-08-20T00:00:00Z",
+      "viewCount": 125000,
+      "likeCount": 8500,
+      "commentCount": 320,
+      "description": "Master React Hooks in this comprehensive tutorial. We'll build real projects while learning each hook.",
+      "tags": ["react", "hooks", "tutorial", "javascript", "frontend"],
+      "contentType": "video"
+    },
+    "relevanceScore": 0.94,
+    "tags": ["youtube", "video", "tutorial", "react", "hooks"]
+  },
+  {
+    "id": "youtube-typescript-advanced-1",
+    "title": "Advanced TypeScript Patterns You Should Know",
+    "content": "Deep dive into advanced TypeScript patterns including conditional types, mapped types, template literal types, and advanced generics. Build type-safe applications with confidence.",
+    "source": "youtube",
+    "url": "https://www.youtube.com/watch?v=zhUwn_wYgog",
+    "metadata": {
+      "channel": "TypeScript Pro",
+      "duration": "32:15",
+      "videoId": "zhUwn_wYgog",
+      "uploadDate": "2025-08-18T00:00:00Z",
+      "viewCount": 89000,
+      "likeCount": 6200,
+      "commentCount": 180,
+      "description": "Learn advanced TypeScript patterns that will make you a better developer. Includes real-world examples.",
+      "tags": ["typescript", "advanced", "patterns", "programming"],
+      "contentType": "video"
+    },
+    "relevanceScore": 0.91,
+    "tags": ["youtube", "video", "tutorial", "typescript", "advanced"]
+  },
+  {
+    "id": "youtube-nodejs-microservices-1",
+    "title": "Building Microservices with Node.js and Docker",
+    "content": "Learn how to build scalable microservices using Node.js, Express, Docker, and Kubernetes. Covers service discovery, API gateways, and inter-service communication.",
+    "source": "youtube",
+    "url": "https://www.youtube.com/watch?v=BnknNTN8icw",
+    "metadata": {
+      "channel": "Cloud Native Dev",
+      "duration": "1:15:45",
+      "videoId": "BnknNTN8icw",
+      "uploadDate": "2025-08-15T00:00:00Z",
+      "viewCount": 156000,
+      "likeCount": 11200,
+      "commentCount": 450,
+      "description": "Complete guide to microservices architecture with Node.js. Build production-ready systems.",
+      "tags": ["nodejs", "microservices", "docker", "kubernetes"],
+      "contentType": "video"
+    },
+    "relevanceScore": 0.96,
+    "tags": ["youtube", "video", "tutorial", "nodejs", "microservices"]
+  },
+  {
+    "id": "youtube-javascript-async-1",
+    "title": "JavaScript Async/Await vs Promises - Complete Guide",
+    "content": "Master asynchronous JavaScript with this comprehensive guide to Promises, async/await, error handling, and concurrent operations. Includes performance comparisons and best practices.",
+    "source": "youtube",
+    "url": "https://www.youtube.com/watch?v=V_Kr9OSfDeU",
+    "metadata": {
+      "channel": "JavaScript Mastery",
+      "duration": "28:40",
+      "videoId": "V_Kr9OSfDeU",
+      "uploadDate": "2025-08-12T00:00:00Z",
+      "viewCount": 203000,
+      "likeCount": 14500,
+      "commentCount": 680,
+      "description": "Everything you need to know about async JavaScript. From callbacks to modern async/await patterns.",
+      "tags": ["javascript", "async", "promises", "programming"],
+      "contentType": "video"
+    },
+    "relevanceScore": 0.93,
+    "tags": ["youtube", "video", "tutorial", "javascript", "async"]
+  },
+  {
+    "id": "youtube-database-design-1",
+    "title": "Database Design Fundamentals - SQL and NoSQL",
+    "content": "Learn database design fundamentals covering normalization, indexing, relationships, and when to choose SQL vs NoSQL. Includes practical examples with PostgreSQL and MongoDB.",
+    "source": "youtube",
+    "url": "https://www.youtube.com/watch?v=ztHopE5Wnpc",
+    "metadata": {
+      "channel": "Database Academy",
+      "duration": "52:20",
+      "videoId": "ztHopE5Wnpc",
+      "uploadDate": "2025-08-08T00:00:00Z",
+      "viewCount": 178000,
+      "likeCount": 9800,
+      "commentCount": 390,
+      "description": "Complete database design course covering both SQL and NoSQL databases with real-world examples.",
+      "tags": ["database", "sql", "nosql", "design", "programming"],
+      "contentType": "video"
+    },
+    "relevanceScore": 0.87,
+    "tags": ["youtube", "video", "tutorial", "database", "sql"]
+  }
+]
+

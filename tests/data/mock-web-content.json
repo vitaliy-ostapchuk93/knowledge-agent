@@ -1,0 +1,93 @@
+[
+  {
+    "id": "web-react-hooks-1",
+    "title": "React Hooks: A Complete Guide - React.dev",
+    "content": "React Hooks are functions that let you use state and other React features without writing a class. This comprehensive guide covers useState, useEffect, useContext, and custom hooks with practical examples and best practices.",
+    "source": "web",
+    "url": "https://react.dev/reference/react/hooks",
+    "metadata": {
+      "domain": "react.dev",
+      "contentType": "documentation",
+      "scrapedAt": "2025-08-24T10:00:00Z",
+      "author": "React Team",
+      "publishDate": "2025-08-01T00:00:00Z",
+      "wordCount": 2500,
+      "language": "en"
+    },
+    "relevanceScore": 0.95,
+    "tags": ["react", "hooks", "documentation", "frontend", "javascript"]
+  },
+  {
+    "id": "web-typescript-best-practices-1",
+    "title": "TypeScript Best Practices 2025 - Dev.to",
+    "content": "Learn the essential TypeScript best practices for 2025. This article covers type safety, generics, utility types, and advanced patterns that will make your code more maintainable and bug-free.",
+    "source": "web",
+    "url": "https://dev.to/typescript-guide/best-practices-2025",
+    "metadata": {
+      "domain": "dev.to",
+      "contentType": "article",
+      "scrapedAt": "2025-08-24T09:30:00Z",
+      "author": "Sarah Johnson",
+      "publishDate": "2025-08-15T00:00:00Z",
+      "wordCount": 1800,
+      "language": "en"
+    },
+    "relevanceScore": 0.88,
+    "tags": ["typescript", "best-practices", "programming", "javascript"]
+  },
+  {
+    "id": "web-nodejs-performance-1",
+    "title": "Node.js Performance Optimization Techniques - Medium",
+    "content": "Discover advanced Node.js performance optimization techniques including event loop management, memory optimization, clustering, and monitoring. Includes real-world examples and benchmarks.",
+    "source": "web",
+    "url": "https://medium.com/nodejs/performance-optimization-2025",
+    "metadata": {
+      "domain": "medium.com",
+      "contentType": "article",
+      "scrapedAt": "2025-08-24T08:45:00Z",
+      "author": "Alex Chen",
+      "publishDate": "2025-08-10T00:00:00Z",
+      "wordCount": 3200,
+      "language": "en"
+    },
+    "relevanceScore": 0.92,
+    "tags": ["nodejs", "performance", "optimization", "backend", "javascript"]
+  },
+  {
+    "id": "web-docker-containers-1",
+    "title": "Docker Container Best Practices - Docker Docs",
+    "content": "Official Docker documentation covering container best practices including image optimization, security, networking, and orchestration with Docker Compose and Kubernetes.",
+    "source": "web",
+    "url": "https://docs.docker.com/develop/dev-best-practices/",
+    "metadata": {
+      "domain": "docs.docker.com",
+      "contentType": "documentation",
+      "scrapedAt": "2025-08-24T11:15:00Z",
+      "author": "Docker Team",
+      "publishDate": "2025-07-20T00:00:00Z",
+      "wordCount": 2800,
+      "language": "en"
+    },
+    "relevanceScore": 0.91,
+    "tags": ["docker", "containers", "devops", "documentation"]
+  },
+  {
+    "id": "web-api-design-1",
+    "title": "RESTful API Design Patterns - Stack Overflow Blog",
+    "content": "Comprehensive guide to RESTful API design patterns covering resource naming, HTTP methods, status codes, pagination, versioning, and authentication strategies.",
+    "source": "web",
+    "url": "https://stackoverflow.blog/api-design-patterns-2025",
+    "metadata": {
+      "domain": "stackoverflow.blog",
+      "contentType": "blog",
+      "scrapedAt": "2025-08-24T07:20:00Z",
+      "author": "Michael Rodriguez",
+      "publishDate": "2025-08-05T00:00:00Z",
+      "wordCount": 2100,
+      "language": "en"
+    },
+    "relevanceScore": 0.89,
+    "tags": ["api", "rest", "design-patterns", "backend", "web-services"]
+  }
+]
+

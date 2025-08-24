@@ -7,6 +7,7 @@
 
 import { describe, test, expect } from 'bun:test';
 import { readFileSync } from 'fs';
+import { join } from 'path';
 import { FileSystemUtils } from './common/test-utils';
 
 describe('Solution Strategy Architecture', () => {
@@ -449,22 +450,40 @@ describe('Solution Strategy Architecture', () => {
 
   describe('Quality and Testing Strategy', () => {
     test('should have comprehensive test coverage', () => {
-      const allFiles = FileSystemUtils.getAllTypeScriptFiles();
-      const testFiles = allFiles.filter(file => file.includes('test') || file.includes('spec'));
-      const sourceFiles = allFiles.filter(file => !file.includes('test') && !file.includes('spec'));
+      // Get source files from src directory
+      const srcFiles = FileSystemUtils.getAllTypeScriptFiles();
+      const sourceFiles = srcFiles.filter(file => !file.includes('test') && !file.includes('spec'));
 
-      // Should have reasonable test coverage - adjust threshold to current reality
-      const testRatio = testFiles.length / sourceFiles.length;
-      expect(testRatio).toBeGreaterThan(0.08); // At least 8% test files (more realistic)
+      // Get test files from tests directory - look for .test.ts files specifically
+      const testPath = join(__dirname, '..');
+      const allTestFiles = FileSystemUtils.getAllTestFiles(testPath);
+
+      // Basic coverage expectations - should have tests for core components
+      expect(allTestFiles.length).toBeGreaterThan(0);
+      expect(sourceFiles.length).toBeGreaterThan(0);
+
+      // Check that major components have corresponding tests
+      const majorComponents = [
+        'knowledge-agent',
+        'file-system-monitor',
+        'web-discovery',
+        'youtube-discovery',
+        'reddit-discovery',
+      ];
+      const missingTests = majorComponents.filter(component => {
+        return !allTestFiles.some(testFile => testFile.includes(component));
+      });
+
+      expect(missingTests).toEqual([]); // All major components should have tests
     });
 
     test('should implement architecture testing', () => {
       // Look for architecture test files in the project
       const currentFilePath = __dirname;
-      
+
       // Check if we have architecture tests directory
       const hasArchitectureTests = currentFilePath.includes('architecture');
-      
+
       // Should have architecture tests (we're running this test from architecture directory)
       expect(hasArchitectureTests).toBe(true);
     });
@@ -472,9 +491,9 @@ describe('Solution Strategy Architecture', () => {
     test('should follow testing best practices', () => {
       // Check the current test file itself for testing framework usage
       const currentFileContent = readFileSync(__filename, 'utf-8');
-      
+
       // Look for testing framework usage in this very file
-      const hasTestingFramework = 
+      const hasTestingFramework =
         currentFileContent.includes('describe') &&
         currentFileContent.includes('test') &&
         currentFileContent.includes('expect');

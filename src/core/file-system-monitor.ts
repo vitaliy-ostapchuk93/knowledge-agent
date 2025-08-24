@@ -8,8 +8,8 @@ import { watch, FSWatcher } from 'fs';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { EventEmitter } from 'events';
-import { IEventBus } from '../interfaces/index.js';
-import { Event } from '../types/index.js';
+import { IEventBus } from '@/interfaces/index.js';
+import { Event } from '@/types/index.js';
 
 export interface IFileSystemMonitor {
   /**

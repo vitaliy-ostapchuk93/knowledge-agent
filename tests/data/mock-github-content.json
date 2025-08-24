@@ -1,0 +1,113 @@
+[
+  {
+    "id": "github-react-hook-form-1",
+    "title": "react-hook-form - Performant, flexible forms with easy validation",
+    "content": "React Hook Form is a library that helps you validate forms in React. It provides performant, flexible forms with easy validation and minimal re-renders. Supports TypeScript and has excellent developer experience.",
+    "source": "github",
+    "url": "https://github.com/react-hook-form/react-hook-form",
+    "metadata": {
+      "owner": "react-hook-form",
+      "repoName": "react-hook-form",
+      "description": "📋 React Hooks for form state management and validation (Web + React Native)",
+      "language": "TypeScript",
+      "stars": 38500,
+      "forks": 1900,
+      "issues": 45,
+      "lastUpdate": "2025-08-23T15:30:00Z",
+      "license": "MIT",
+      "topics": ["react", "hooks", "forms", "validation", "typescript"],
+      "contentType": "repository"
+    },
+    "relevanceScore": 0.96,
+    "tags": ["github", "repository", "react", "forms", "hooks", "validation"]
+  },
+  {
+    "id": "github-typescript-eslint-1",
+    "title": "typescript-eslint - Monorepo for all the tooling related to using TypeScript with ESLint",
+    "content": "TypeScript ESLint provides TypeScript support for ESLint. It consists of a parser and a set of rules that work with TypeScript code. Essential for maintaining code quality in TypeScript projects.",
+    "source": "github",
+    "url": "https://github.com/typescript-eslint/typescript-eslint",
+    "metadata": {
+      "owner": "typescript-eslint",
+      "repoName": "typescript-eslint",
+      "description": "✨ Monorepo for all the tooling related to using TypeScript with ESLint",
+      "language": "TypeScript",
+      "stars": 14200,
+      "forks": 2100,
+      "issues": 180,
+      "lastUpdate": "2025-08-24T10:15:00Z",
+      "license": "BSD-2-Clause",
+      "topics": ["typescript", "eslint", "linting", "javascript", "static-analysis"],
+      "contentType": "repository"
+    },
+    "relevanceScore": 0.93,
+    "tags": ["github", "repository", "typescript", "eslint", "linting"]
+  },
+  {
+    "id": "github-nestjs-1",
+    "title": "nestjs - A progressive Node.js framework for building efficient, reliable and scalable server-side applications",
+    "content": "NestJS is a framework for building efficient, reliable and scalable Node.js server-side applications. It uses TypeScript by default and combines elements of OOP, FP, and FRP.",
+    "source": "github",
+    "url": "https://github.com/nestjs/nest",
+    "metadata": {
+      "owner": "nestjs",
+      "repoName": "nest",
+      "description": "A progressive Node.js framework for building efficient, reliable and scalable server-side applications.",
+      "language": "TypeScript",
+      "stars": 65800,
+      "forks": 7600,
+      "issues": 90,
+      "lastUpdate": "2025-08-24T08:45:00Z",
+      "license": "MIT",
+      "topics": ["nodejs", "typescript", "framework", "backend", "microservices"],
+      "contentType": "repository"
+    },
+    "relevanceScore": 0.94,
+    "tags": ["github", "repository", "nodejs", "framework", "typescript"]
+  },
+  {
+    "id": "github-prisma-1",
+    "title": "prisma - Next-generation Node.js and TypeScript ORM",
+    "content": "Prisma is a next-generation Node.js and TypeScript ORM that provides type safety, auto-completion, and a powerful query engine. It simplifies database access and management.",
+    "source": "github",
+    "url": "https://github.com/prisma/prisma",
+    "metadata": {
+      "owner": "prisma",
+      "repoName": "prisma",
+      "description": "Next-generation ORM for Node.js & TypeScript | PostgreSQL, MySQL, MariaDB, SQL Server, SQLite, MongoDB and CockroachDB",
+      "language": "TypeScript",
+      "stars": 37200,
+      "forks": 1400,
+      "issues": 320,
+      "lastUpdate": "2025-08-24T12:20:00Z",
+      "license": "Apache-2.0",
+      "topics": ["database", "orm", "typescript", "prisma", "postgresql"],
+      "contentType": "repository"
+    },
+    "relevanceScore": 0.91,
+    "tags": ["github", "repository", "database", "orm", "typescript"]
+  },
+  {
+    "id": "github-awesome-nodejs-1",
+    "title": "awesome-nodejs - Delightful Node.js packages and resources",
+    "content": "A curated list of delightful Node.js packages and resources. Covers frameworks, utilities, databases, testing tools, and much more. Regularly updated by the community.",
+    "source": "github",
+    "url": "https://github.com/sindresorhus/awesome-nodejs",
+    "metadata": {
+      "owner": "sindresorhus",
+      "repoName": "awesome-nodejs",
+      "description": "⚡ Delightful Node.js packages and resources",
+      "language": null,
+      "stars": 55600,
+      "forks": 5800,
+      "issues": 12,
+      "lastUpdate": "2025-08-22T16:30:00Z",
+      "license": "CC0-1.0",
+      "topics": ["awesome", "nodejs", "javascript", "resources", "packages"],
+      "contentType": "repository"
+    },
+    "relevanceScore": 0.85,
+    "tags": ["github", "repository", "awesome", "nodejs", "resources"]
+  }
+]
+

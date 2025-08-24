@@ -3,15 +3,15 @@
  * Provides local AI-like functionality for demonstration purposes
  */
 
-import { IProcessingStrategy } from '../interfaces/index.js';
+import { IProcessingStrategy } from '@/interfaces/index.js';
 import {
+  Summary,
   ProcessingStrategy,
   ProcessingOptions,
-  Summary,
   Analysis,
   CodeExample,
   RelatedLink,
-} from '../types/index.js';
+} from '@/types/index.js';
 
 export class MockAIStrategy implements IProcessingStrategy {
   readonly strategyType = ProcessingStrategy.LOCAL;
@@ -117,23 +117,24 @@ export class MockAIStrategy implements IProcessingStrategy {
     const headers = cleanContent.match(/^#{1,6}\s+(.+)$/gm) || [];
     const listItems = cleanContent.match(/^\s*[-*+]\s+(.+)$/gm) || [];
     const numberedItems = cleanContent.match(/^\s*\d+\.\s+(.+)$/gm) || [];
-    
+
     // Clean and collect all potential points
     const allPoints = [
       ...headers.map(h => h.replace(/^#{1,6}\s+/, '').trim()),
       ...listItems.map(li => li.replace(/^\s*[-*+]\s+/, '').trim()),
-      ...numberedItems.map(ni => ni.replace(/^\s*\d+\.\s+/, '').trim())
+      ...numberedItems.map(ni => ni.replace(/^\s*\d+\.\s+/, '').trim()),
     ];
 
     // Filter for meaningful content and avoid code fragments
-    const meaningfulPoints = allPoints.filter(point => 
-      point.length > 3 && 
-      point.length < 80 && 
-      !point.includes('{') && 
-      !point.includes('}') && 
-      !point.includes('()') &&
-      !point.includes('===') &&
-      /^[A-Z]/.test(point) // Starts with capital letter
+    const meaningfulPoints = allPoints.filter(
+      point =>
+        point.length > 3 &&
+        point.length < 80 &&
+        !point.includes('{') &&
+        !point.includes('}') &&
+        !point.includes('()') &&
+        !point.includes('===') &&
+        /^[A-Z]/.test(point) // Starts with capital letter
     );
 
     // If we have meaningful points, use them
@@ -144,7 +145,7 @@ export class MockAIStrategy implements IProcessingStrategy {
     // Fallback: generate topic-based key points
     const contentLower = content.toLowerCase();
     const fallbackPoints = [];
-    
+
     if (contentLower.includes('react')) {
       fallbackPoints.push(
         'Understanding React component architecture',
@@ -432,72 +433,72 @@ export class MockAIStrategy implements IProcessingStrategy {
   /**
    * Generate summary text
    */
-	private generateSummaryText(content: string): string {
-		// Clean content by removing code blocks, frontmatter, and markdown syntax
-		const cleanContent = content
-			.replace(/^---[\s\S]*?---/m, '') // Remove frontmatter
-			.replace(/```[\s\S]*?```/g, '') // Remove code blocks
-			.replace(/`[^`]*`/g, '') // Remove inline code
-			.replace(/#{1,6}\s+/g, '') // Remove headers
-			.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Convert links to text
-			.replace(/[*_]{1,2}([^*_]+)[*_]{1,2}/g, '$1') // Remove emphasis
-			.replace(/^\s*[-*+]\s+/gm, '') // Remove list markers
-			.replace(/^\s*\d+\.\s+/gm, '') // Remove numbered list markers
-			.replace(/\s+/g, ' ') // Normalize whitespace
-			.trim();
+  private generateSummaryText(content: string): string {
+    // Clean content by removing code blocks, frontmatter, and markdown syntax
+    const cleanContent = content
+      .replace(/^---[\s\S]*?---/m, '') // Remove frontmatter
+      .replace(/```[\s\S]*?```/g, '') // Remove code blocks
+      .replace(/`[^`]*`/g, '') // Remove inline code
+      .replace(/#{1,6}\s+/g, '') // Remove headers
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Convert links to text
+      .replace(/[*_]{1,2}([^*_]+)[*_]{1,2}/g, '$1') // Remove emphasis
+      .replace(/^\s*[-*+]\s+/gm, '') // Remove list markers
+      .replace(/^\s*\d+\.\s+/gm, '') // Remove numbered list markers
+      .replace(/\s+/g, ' ') // Normalize whitespace
+      .trim();
 
-		// Extract meaningful phrases and concepts
-		const lines = cleanContent.split('\n').filter(line => line.trim().length > 5);
-		const concepts = [];
-		
-		for (const line of lines) {
-			const trimmed = line.trim();
-			if (trimmed.length > 10 && trimmed.length < 100) {
-				// Skip fragments and incomplete sentences
-				if (!trimmed.includes('{') && !trimmed.includes('}') && !trimmed.includes('()')) {
-					concepts.push(trimmed);
-				}
-			}
-		}
+    // Extract meaningful phrases and concepts
+    const lines = cleanContent.split('\n').filter(line => line.trim().length > 5);
+    const concepts = [];
 
-		// Create a coherent summary from the extracted concepts
-		const mainConcepts = concepts.slice(0, 3);
-		const topicName = this.extractTopicName(content);
-		
-		let summaryText = `This guide provides comprehensive coverage of ${topicName}.`;
-		
-		if (mainConcepts.length > 0) {
-			summaryText += ` Key areas include: ${mainConcepts.join(', ')}.`;
-		}
-		
-		summaryText += ` The content covers essential concepts, practical examples, and implementation guidance for developers at various skill levels.`;
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.length > 10 && trimmed.length < 100) {
+        // Skip fragments and incomplete sentences
+        if (!trimmed.includes('{') && !trimmed.includes('}') && !trimmed.includes('()')) {
+          concepts.push(trimmed);
+        }
+      }
+    }
 
-		// Count approximate words for metadata
-		const wordCount = cleanContent.split(/\s+/).filter(word => word.length > 0).length;
-		const keyAreas = Math.min(5, Math.max(3, Math.floor(concepts.length / 2)));
-		
-		return `${summaryText}
+    // Create a coherent summary from the extracted concepts
+    const mainConcepts = concepts.slice(0, 3);
+    const topicName = this.extractTopicName(content);
+
+    let summaryText = `This guide provides comprehensive coverage of ${topicName}.`;
+
+    if (mainConcepts.length > 0) {
+      summaryText += ` Key areas include: ${mainConcepts.join(', ')}.`;
+    }
+
+    summaryText += ` The content covers essential concepts, practical examples, and implementation guidance for developers at various skill levels.`;
+
+    // Count approximate words for metadata
+    const wordCount = cleanContent.split(/\s+/).filter(word => word.length > 0).length;
+    const keyAreas = Math.min(5, Math.max(3, Math.floor(concepts.length / 2)));
+
+    return `${summaryText}
 
 This comprehensive resource covers ${keyAreas} key areas across approximately ${wordCount} words. The material includes practical examples and step-by-step guidance for effective implementation.`;
-	}
+  }
 
-	private extractTopicName(content: string): string {
-		// Extract title from first header or generate from content
-		const titleMatch = content.match(/^#\s+(.+)$/m);
-		if (titleMatch) {
-			return titleMatch[1].trim();
-		}
-		
-		// Fallback to extracting from common programming topics
-		const contentLower = content.toLowerCase();
-		if (contentLower.includes('react')) return 'React development';
-		if (contentLower.includes('typescript')) return 'TypeScript programming';
-		if (contentLower.includes('javascript')) return 'JavaScript development';
-		if (contentLower.includes('node')) return 'Node.js development';
-		if (contentLower.includes('database')) return 'database design';
-		
-		return 'software development concepts';
-	}  /**
+  private extractTopicName(content: string): string {
+    // Extract title from first header or generate from content
+    const titleMatch = content.match(/^#\s+(.+)$/m);
+    if (titleMatch) {
+      return titleMatch[1].trim();
+    }
+
+    // Fallback to extracting from common programming topics
+    const contentLower = content.toLowerCase();
+    if (contentLower.includes('react')) return 'React development';
+    if (contentLower.includes('typescript')) return 'TypeScript programming';
+    if (contentLower.includes('javascript')) return 'JavaScript development';
+    if (contentLower.includes('node')) return 'Node.js development';
+    if (contentLower.includes('database')) return 'database design';
+
+    return 'software development concepts';
+  } /**
    * Simulate processing delay
    */
   private async delay(ms: number): Promise<void> {

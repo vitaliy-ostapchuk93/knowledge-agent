@@ -1,6 +1,6 @@
 # Universal Knowledge Agent
 
-A cross-platform knowledge management integration system that provides unified access to various knowledge management platforms (Logseq, Obsidian, Notion) and content sources.
+A cross-platform knowledge management integration system that provides unified access to various knowledge management platforms (Logseq, Obsidian, Notion, etc.) and content sources.
 
 ## 🚀 Quick Start
 

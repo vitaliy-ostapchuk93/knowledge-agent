@@ -32,7 +32,8 @@
       "@/ai/*": ["src/ai/*"],
       "@/cache/*": ["src/cache/*"],
       "@/discovery/*": ["src/discovery/*"],
-      "@/events/*": ["src/events/*"]
+      "@/events/*": ["src/events/*"],
+      "@/tests/*": ["tests/*"]
     }
   },
   "include": ["src/**/*", "tests/**/*", "*.ts", "*.js"],

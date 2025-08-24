@@ -3,8 +3,8 @@
  * Provides publish-subscribe functionality for loose coupling
  */
 
-import { IEventBus } from '../interfaces/index.js';
-import { Event } from '../types/index.js';
+import { IEventBus } from '@/interfaces/index.js';
+import { Event } from '@/types/index.js';
 
 type EventHandler<T = unknown> = (data: T) => void;
 type EventHandlerGeneric = (event: Event) => void;

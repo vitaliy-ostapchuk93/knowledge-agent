@@ -134,6 +134,39 @@ export class FileSystemUtils {
   }
 
   /**
+   * Get all test files in a directory recursively
+   */
+  static getAllTestFiles(dir: string): string[] {
+    const files: string[] = [];
+
+    try {
+      const items = readdirSync(dir);
+
+      for (const item of items) {
+        const fullPath = join(dir, item);
+        const stat = statSync(fullPath);
+
+        if (stat.isDirectory()) {
+          files.push(...this.getAllTestFiles(fullPath));
+        } else if (this.isTestFile(item)) {
+          files.push(fullPath);
+        }
+      }
+    } catch {
+      // Directory might not exist yet
+    }
+
+    return files;
+  }
+
+  /**
+   * Check if file is a test file
+   */
+  static isTestFile(filename: string): boolean {
+    return filename.endsWith('.test.ts') || filename.endsWith('.spec.ts');
+  }
+
+  /**
    * Check if file is a TypeScript file (excluding tests and declarations)
    */
   static isTypeScriptFile(filename: string): boolean {

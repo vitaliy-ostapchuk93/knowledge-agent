@@ -10,7 +10,7 @@ import {
   ICacheManager,
   IEventBus,
   IContentDiscovery,
-} from '../interfaces/index.js';
+} from '@/interfaces/index.js';
 import {
   ContentItem,
   ContentResult,
@@ -22,7 +22,7 @@ import {
   Event,
   ContentSource,
   ContentType,
-} from '../types/index.js';
+} from '@/types/index.js';
 
 export interface IKnowledgeAgentConfig {
   watchDirectories: string[];
