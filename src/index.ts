@@ -30,6 +30,9 @@ async function main() {
 
     // Run the comprehensive MVP demo
     await runMVPDemo();
+    
+    console.log('\n🎯 System completed successfully! Exiting...');
+    process.exit(0);
   } catch (error) {
     console.error('❌ Error running Knowledge Agent:', error);
     process.exit(1);
@@ -37,4 +40,4 @@ async function main() {
 }
 
 // Execute main function
-main().catch(console.error);
+main();

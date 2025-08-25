@@ -7,6 +7,8 @@ import { KnowledgeAgent } from '@/core/knowledge-agent.js';
 import { MarkdownAdapter } from '@/adapters/markdown-adapter.js';
 import { MockAIStrategy } from '@/ai/mock-ai-strategy.js';
 import { MockContentDiscovery } from '@/discovery/mock-content-discovery.js';
+import { RealWebDiscovery } from '@/discovery/real-web-discovery.js';
+import { KnowledgeLinkingEngine } from '@/core/knowledge-linking-engine.js';
 import { MemoryCacheManager } from '@/cache/memory-cache-manager.js';
 import { SimpleEventBus } from '@/events/simple-event-bus.js';
 import { PlatformType, SummaryStrategy } from '@/types/index.js';
@@ -42,9 +44,24 @@ export async function runMVPDemo(): Promise<void> {
     await demoScenario1(agent); // Basic content discovery and summarization
     await demoScenario2(agent); // Multi-query workflow
     await demoScenario3(agent); // Cache performance
+    await demoScenario4(); // Knowledge linking engine
 
     // Step 4: Show results
     await showResults(eventBus, cacheManager);
+
+    // Step 5: Cleanup resources
+    console.log('\n🧹 Cleaning up resources...');
+    
+    // Clear event bus subscriptions
+    if (eventBus && typeof eventBus.clearSubscriptions === 'function') {
+      eventBus.clearSubscriptions();
+      eventBus.clearHistory();
+    }
+    
+    // Clear cache
+    if (cacheManager && typeof cacheManager.clear === 'function') {
+      await cacheManager.clear();
+    }
 
     console.log('\n✅ MVP Demo completed successfully!');
     console.log(`📁 Check the knowledge base at: ${DEMO_CONFIG.baseDirectory}`);
@@ -296,10 +313,94 @@ function setupEventLogging(eventBus: SimpleEventBus): void {
   });
 }
 
-// Run demo if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  runMVPDemo().catch(console.error);
+/**
+ * Demo Scenario 4: Knowledge Linking Engine
+ */
+async function demoScenario4(): Promise<void> {
+  console.log('\n🔗 Demo Scenario 4: Knowledge Linking Engine');
+  console.log('='.repeat(50));
+
+  const linkingEngine = new KnowledgeLinkingEngine();
+  const realWebDiscovery = new RealWebDiscovery();
+
+  // Create a diverse set of content to demonstrate linking
+  console.log('📚 Building knowledge base with diverse content...');
+
+  // Get content about React
+  const reactContent = await realWebDiscovery.discover('React basics', { maxResults: 2 });
+  for (const content of reactContent) {
+    await linkingEngine.addContent(content);
+  }
+
+  // Get content about TypeScript
+  const typescriptContent = await realWebDiscovery.discover('TypeScript fundamentals', { maxResults: 2 });
+  for (const content of typescriptContent) {
+    await linkingEngine.addContent(content);
+  }
+
+  // Get content about Next.js (should link to React)
+  const nextjsContent = await realWebDiscovery.discover('Next.js tutorial', { maxResults: 1 });
+  for (const content of nextjsContent) {
+    const newLinks = await linkingEngine.addContent(content);
+    
+    if (newLinks.length > 0) {
+      console.log(`\n🔗 Found ${newLinks.length} links for "${content.title}":`);
+      newLinks.forEach(link => {
+        const targetContent = linkingEngine.exportGraph().nodes.get(link.targetId);
+        console.log(`   → ${link.linkType} (${Math.round(link.strength * 100)}%): ${targetContent?.title}`);
+        console.log(`     Reason: ${link.reason}`);
+      });
+    }
+  }
+
+  // Show knowledge graph statistics
+  const stats = linkingEngine.getGraphStats();
+  console.log('\n📊 Knowledge Graph Statistics:');
+  console.log(`   Nodes: ${stats.nodeCount}`);
+  console.log(`   Links: ${stats.linkCount}`);
+  console.log(`   Average links per node: ${stats.averageLinks.toFixed(1)}`);
+  console.log(`   Link types:`, Object.entries(stats.linkTypes)
+    .map(([type, count]) => `${type}(${count})`)
+    .join(', '));
+
+  // Demonstrate link retrieval for a specific content
+  const allNodes = Array.from(linkingEngine.exportGraph().nodes.values());
+  if (allNodes.length > 0) {
+    const sampleContent = allNodes[0];
+    const contentLinks = linkingEngine.getLinksForContent(sampleContent.id);
+    console.log(`\n🔍 Links for "${sampleContent.title}":`);
+    contentLinks.forEach(link => {
+      const isSource = link.sourceId === sampleContent.id;
+      const relatedId = isSource ? link.targetId : link.sourceId;
+      const relatedContent = linkingEngine.exportGraph().nodes.get(relatedId);
+      const direction = isSource ? '→' : '←';
+      console.log(`   ${direction} ${link.linkType}: ${relatedContent?.title}`);
+    });
+  }
+
+  console.log('✅ Scenario 4 completed\n');
 }
 
-// Also run automatically for demo purposes
-runMVPDemo().catch(console.error);
+// Run demo directly
+console.log('🚀 Starting demo...');
+runMVPDemo()
+  .then(() => {
+    console.log('\n🎯 Demo completed! Exiting...');
+    // Force exit after a short delay to allow any final logging
+    setTimeout(() => {
+      console.log('🔄 Forcing exit...');
+      process.exit(0);
+    }, 100);
+  })
+  .catch((error) => {
+    console.error('\n❌ Demo failed:', error);
+    setTimeout(() => {
+      process.exit(1);
+    }, 100);
+  });
+
+// Safety timeout to prevent hanging
+setTimeout(() => {
+  console.log('\n⏰ Demo timeout reached, forcing exit...');
+  process.exit(0);
+}, 60000); // 60 seconds timeout
