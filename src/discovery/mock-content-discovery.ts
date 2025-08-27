@@ -571,6 +571,24 @@ After completing this guide, you'll be ready to implement ${query} in your own p
   }
 
   /**
+   * Format content data as JSON string for API responses
+   */
+  private formatContentAsJSON(content: ContentItem[]): string {
+    return JSON.stringify(content, null, 2);
+  }
+
+  /**
+   * Parse JSON content data from external sources
+   */
+  private parseContentFromJSON(jsonData: string): ContentItem[] {
+    try {
+      return JSON.parse(jsonData);
+    } catch {
+      return [];
+    }
+  }
+
+  /**
    * Simulate network delay
    */
   private async delay(ms: number): Promise<void> {
