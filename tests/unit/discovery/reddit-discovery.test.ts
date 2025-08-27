@@ -1,17 +1,16 @@
 import { describe, expect, it, beforeEach, afterEach } from 'bun:test';
-import { RedditDiscovery } from '@/discovery/reddit-discovery.js';
-import { ContentSource } from '@/types/index.js';
+import { RedditDiscovery } from '@/discovery/reddit-discovery.ts';
+import { ContentSource } from '@/types/index.ts';
 
 describe('Reddit Discovery', () => {
   let redditDiscovery: RedditDiscovery;
 
   beforeEach(() => {
-    console.log('Setting up tests...');
     redditDiscovery = new RedditDiscovery();
   });
 
   afterEach(() => {
-    console.log('Cleaning up tests...');
+    // Cleanup if needed
   });
 
   it('should discover Reddit content successfully', async () => {

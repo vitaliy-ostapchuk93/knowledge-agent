@@ -10,7 +10,7 @@ import {
   ICacheManager,
   IEventBus,
   IContentDiscovery,
-} from '@/interfaces/index.js';
+} from '@/interfaces/index.ts';
 import {
   ContentItem,
   ContentResult,
@@ -22,7 +22,8 @@ import {
   Event,
   ContentSource,
   ContentType,
-} from '@/types/index.js';
+} from '@/types/index.ts';
+import { logger } from '@/utils/logger.ts';
 
 export interface IKnowledgeAgentConfig {
   watchDirectories: string[];
@@ -70,7 +71,7 @@ export class KnowledgeAgent implements IKnowledgeAgent {
         // Verify adapter health
         const isHealthy = await adapter.healthCheck();
         if (!isHealthy) {
-          console.warn(`Platform adapter ${adapter.platformType} failed health check`);
+          logger.warn(`Platform adapter ${adapter.platformType} failed health check`);
         }
       }
 
@@ -81,7 +82,7 @@ export class KnowledgeAgent implements IKnowledgeAgent {
         // Check strategy availability
         const isAvailable = await strategy.isAvailable();
         if (!isAvailable) {
-          console.warn(`Processing strategy ${strategy.strategyType} is not available`);
+          logger.warn(`Processing strategy ${strategy.strategyType} is not available`);
         }
       }
 
@@ -101,9 +102,9 @@ export class KnowledgeAgent implements IKnowledgeAgent {
         },
       });
 
-      console.log('✅ Knowledge Agent initialized successfully');
+      logger.debug('✅ Knowledge Agent initialized successfully');
     } catch (error) {
-      console.error('❌ Failed to initialize Knowledge Agent:', error);
+      logger.error('❌ Failed to initialize Knowledge Agent:', error);
       throw error;
     }
   }
@@ -135,7 +136,7 @@ export class KnowledgeAgent implements IKnowledgeAgent {
       if (this.cacheManager) {
         const cached = await this.cacheManager.get<ContentResult>(cacheKey);
         if (cached) {
-          console.log(`📦 Cache hit for query: ${query}`);
+          logger.debug(`📦 Cache hit for query: ${query}`);
           return cached;
         }
       }
@@ -153,7 +154,13 @@ export class KnowledgeAgent implements IKnowledgeAgent {
 
       if (this.contentDiscovery) {
         // Use injected mock content discovery
-        const result = await this.contentDiscovery.searchContent(searchOptions);
+        const result = await this.contentDiscovery.discover(query, {
+          maxResults: options?.maxResults,
+          sources: options?.sources,
+          difficulty: options?.difficulty,
+          includeCode: options?.includeCode,
+          language: options?.language,
+        });
         mockContent = result.items;
         discoverySearchTime = result.searchTime;
       } else {
@@ -206,7 +213,7 @@ export class KnowledgeAgent implements IKnowledgeAgent {
         },
       });
 
-      console.log(
+      logger.debug(
         `🔍 Discovered ${result.totalFound} items for "${query}" in ${result.searchTime}ms`
       );
       return result;
@@ -218,7 +225,7 @@ export class KnowledgeAgent implements IKnowledgeAgent {
         data: { query, error: (error as Error).message },
       });
 
-      console.error(`❌ Content discovery failed for "${query}":`, error);
+      logger.error(`❌ Content discovery failed for "${query}":`, error);
       throw error;
     }
   }
@@ -276,7 +283,7 @@ export class KnowledgeAgent implements IKnowledgeAgent {
         data: { strategy, summaryLength: summary.summary.length },
       });
 
-      console.log(
+      logger.debug(
         `📝 Generated ${strategy.toLowerCase()} summary (${summary.summary.length} chars)`
       );
       return summary;
@@ -288,7 +295,7 @@ export class KnowledgeAgent implements IKnowledgeAgent {
         data: { strategy, error: (error as Error).message },
       });
 
-      console.error(`❌ Summarization failed with ${strategy} strategy:`, error);
+      logger.error(`❌ Summarization failed with ${strategy} strategy:`, error);
       throw error;
     }
   }
@@ -330,7 +337,7 @@ export class KnowledgeAgent implements IKnowledgeAgent {
         for (const link of summary.links) {
           // In a real implementation, we would resolve the link to an internal ID
           // For now, we'll skip the actual linking
-          console.log(`Would link to: ${link.title} (${link.url})`);
+          logger.debug(`Would link to: ${link.title} (${link.url})`);
         }
       }
 
@@ -341,7 +348,7 @@ export class KnowledgeAgent implements IKnowledgeAgent {
         data: { targetPlatform, contentId, summaryId: summary.id },
       });
 
-      console.log(`✅ Integrated summary into ${targetPlatform} with ID: ${contentId}`);
+      logger.debug(`✅ Integrated summary into ${targetPlatform} with ID: ${contentId}`);
     } catch (error) {
       this.publishEvent({
         type: 'integration.failed',
@@ -350,7 +357,7 @@ export class KnowledgeAgent implements IKnowledgeAgent {
         data: { targetPlatform, error: (error as Error).message },
       });
 
-      console.error(`❌ Integration failed for ${targetPlatform}:`, error);
+      logger.error(`❌ Integration failed for ${targetPlatform}:`, error);
       throw error;
     }
   }
@@ -365,7 +372,7 @@ export class KnowledgeAgent implements IKnowledgeAgent {
   ): Promise<Summary> {
     this.ensureInitialized();
 
-    console.log(`🚀 Processing query: "${query}" for ${targetPlatform}`);
+    logger.debug(`🚀 Processing query: "${query}" for ${targetPlatform}`);
 
     try {
       // Step 1: Discover content
@@ -378,10 +385,10 @@ export class KnowledgeAgent implements IKnowledgeAgent {
       // Step 3: Integrate into platform
       await this.integrateKnowledge(summary, targetPlatform);
 
-      console.log(`✅ Complete workflow finished for "${query}"`);
+      logger.debug(`✅ Complete workflow finished for "${query}"`);
       return summary;
     } catch (error) {
-      console.error(`❌ Workflow failed for "${query}":`, error);
+      logger.error(`❌ Workflow failed for "${query}":`, error);
       throw error;
     }
   }

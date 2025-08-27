@@ -3,9 +3,10 @@
  * Tests the file system monitoring functionality
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
-import { FileSystemMonitor } from '@/core/file-system-monitor.js';
-import { SimpleEventBus } from '@/events/simple-event-bus.js';
+import { describe, it, expect, beforeEach, afterEach, spyOn } from 'bun:test';
+import { FileSystemMonitor } from '@/core/file-system-monitor.ts';
+import { SimpleEventBus } from '@/events/simple-event-bus.ts';
+import { logger } from '@/utils/logger.ts';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { tmpdir } from 'os';
@@ -150,11 +151,22 @@ describe('File System Monitor', () => {
   it('should handle non-existent directories gracefully', async () => {
     const nonExistentDir = path.join(testDir, 'does-not-exist');
 
-    // Should not throw error
-    await expect(monitor.startWatching([nonExistentDir])).resolves.toBeUndefined();
+    // Mock the logger to suppress warning output during this test
+    const warnSpy = spyOn(logger, 'warn').mockImplementation(() => {});
+    
+    try {
+      // Should not throw error
+      await expect(monitor.startWatching([nonExistentDir])).resolves.toBeUndefined();
 
-    // Should not add non-existent directory to watched list
-    expect(monitor.getWatchedDirectories()).not.toContain(nonExistentDir);
+      // Should not add non-existent directory to watched list
+      expect(monitor.getWatchedDirectories()).not.toContain(nonExistentDir);
+      
+      // Verify that a warning was logged (but suppressed)
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Directory not found'));
+    } finally {
+      // Restore the original logger function
+      warnSpy.mockRestore();
+    }
   });
 
   it('should scan nested directories recursively', async () => {

@@ -9,8 +9,9 @@ import {
   SearchOptions,
   ContentResult,
   ContentType,
-} from '@/types/index.js';
-import { IContentDiscovery } from '@/interfaces/index.js';
+} from '@/types/index.ts';
+import { IContentDiscovery } from '@/interfaces/index.ts';
+import { logger } from '@/utils/logger.ts';
 
 export class MockContentDiscovery implements IContentDiscovery {
   private mockDatabase: ContentItem[] = [];
@@ -20,33 +21,30 @@ export class MockContentDiscovery implements IContentDiscovery {
   }
 
   /**
-   * Search for content across multiple sources
+   * Discover content across multiple sources
    */
-  async searchContent(options: SearchOptions): Promise<ContentResult> {
+  async discover(query: string, options: Partial<SearchOptions> = {}): Promise<ContentResult> {
     const start = Date.now();
 
-    console.log(`🔍 Searching for: "${options.query}"`);
+    logger.debug(`🔍 Searching for: "${query}"`);
 
     // Simulate network delay
     await this.delay(100);
 
     const results = this.mockDatabase
-      .filter(item => this.isRelevant(item, options.query))
+      .filter(item => this.isRelevant(item, query))
       .sort((a, b) => b.relevanceScore - a.relevanceScore)
       .slice(0, options.maxResults || 5);
 
     // Generate additional dynamic content if needed
     const maxResults = options.maxResults || 5;
     if (results.length < maxResults) {
-      const additionalContent = this.generateDynamicContent(
-        options.query,
-        maxResults - results.length
-      );
+      const additionalContent = this.generateDynamicContent(query, maxResults - results.length);
       results.push(...additionalContent);
     }
 
     const searchTime = Date.now() - start;
-    console.log(`✅ Found ${results.length} items in ${searchTime}ms`);
+    logger.debug(`✅ Found ${results.length} items in ${searchTime}ms`);
 
     return {
       items: results,
@@ -96,7 +94,7 @@ export class MockContentDiscovery implements IContentDiscovery {
    * Discover content based on query
    */
   async discoverContent(query: string, maxResults: number = 5): Promise<ContentItem[]> {
-    console.log(`🔍 Discovering content for: "${query}"`);
+    logger.debug(`🔍 Discovering content for: "${query}"`);
 
     // Simulate network delay
     await this.delay(800);
@@ -112,7 +110,7 @@ export class MockContentDiscovery implements IContentDiscovery {
       results.push(...additionalContent);
     }
 
-    console.log(`✅ Found ${results.length} relevant items`);
+    logger.debug(`✅ Found ${results.length} relevant items`);
     return results;
   }
 

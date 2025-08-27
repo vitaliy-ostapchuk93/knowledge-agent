@@ -3,7 +3,7 @@
  * Provides local AI-like functionality for demonstration purposes
  */
 
-import { IProcessingStrategy } from '@/interfaces/index.js';
+import { IProcessingStrategy } from '@/interfaces/index.ts';
 import {
   Summary,
   ProcessingStrategy,
@@ -11,7 +11,8 @@ import {
   Analysis,
   CodeExample,
   RelatedLink,
-} from '@/types/index.js';
+} from '@/types/index.ts';
+import { logger } from '@/utils/logger.ts';
 
 export class MockAIStrategy implements IProcessingStrategy {
   readonly strategyType = ProcessingStrategy.LOCAL;
@@ -20,7 +21,7 @@ export class MockAIStrategy implements IProcessingStrategy {
    * Summarize content using local processing
    */
   async summarize(content: string, _options?: ProcessingOptions): Promise<Summary> {
-    console.log('🤖 Generating mock AI summary...');
+    logger.debug('🤖 Generating mock AI summary...');
 
     // Simulate processing delay
     await this.delay(500);
@@ -47,7 +48,7 @@ export class MockAIStrategy implements IProcessingStrategy {
       actionableItems,
     };
 
-    console.log(`📝 Generated mock summary with ${keyPoints.length} key points`);
+    logger.debug(`📝 Generated mock summary with ${keyPoints.length} key points`);
     return summary;
   }
 

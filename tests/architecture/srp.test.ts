@@ -21,10 +21,6 @@ describe('Single Responsibility Principle', () => {
       }
     }
 
-    if (violations.length > 0) {
-      console.warn('SRP violations found:', violations);
-    }
-
     // Allow some violations for legacy code, but track them
     expect(violations.length).toBeLessThanOrEqual(ARCHITECTURE_CONFIG.limits.maxSrpViolations);
   });

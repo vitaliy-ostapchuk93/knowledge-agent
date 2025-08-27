@@ -3,10 +3,11 @@
  * Handles generic markdown files for local knowledge management
  */
 
-import { IPlatformAdapter } from '../interfaces/index.js';
-import { PlatformType, FormattedContent, ExistingContent } from '../types/index.js';
+import { IPlatformAdapter, PlatformMetadata, ExportOptions } from '@/interfaces';
+import { PlatformType, FormattedContent, ExistingContent } from '@/types';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { logger } from '@/utils/logger.ts';
 
 export class MarkdownAdapter implements IPlatformAdapter {
   readonly platformType = PlatformType.OBSIDIAN; // Using Obsidian as the base markdown format
@@ -34,10 +35,10 @@ export class MarkdownAdapter implements IPlatformAdapter {
       // Write file
       await fs.writeFile(filePath, markdownContent, 'utf-8');
 
-      console.log(`📝 Created markdown file: ${filename}`);
+      logger.debug(`📝 Created markdown file: ${filename}`);
       return filePath;
     } catch (error) {
-      console.error('❌ Failed to create markdown content:', error);
+      logger.error('❌ Failed to create markdown content:', error);
       throw error;
     }
   }
@@ -59,10 +60,10 @@ export class MarkdownAdapter implements IPlatformAdapter {
       // Check if the link already exists
       if (!sourceContent.includes(`[[${targetFilename}]]`)) {
         await fs.writeFile(sourceId, sourceContent + linkText, 'utf-8');
-        console.log(`🔗 Added link from ${path.basename(sourceId)} to ${targetFilename}`);
+        logger.debug(`🔗 Added link from ${path.basename(sourceId)} to ${targetFilename}`);
       }
     } catch (error) {
-      console.error('❌ Failed to link content:', error);
+      logger.error('❌ Failed to search existing content:', error);
       throw error;
     }
   }
@@ -98,7 +99,7 @@ export class MarkdownAdapter implements IPlatformAdapter {
 
       return results;
     } catch (error) {
-      console.error('❌ Failed to search existing content:', error);
+      logger.error('❌ Failed to search existing content:', error);
       throw error;
     }
   }
@@ -110,9 +111,9 @@ export class MarkdownAdapter implements IPlatformAdapter {
     try {
       const markdownContent = this.formatAsMarkdown(content);
       await fs.writeFile(id, markdownContent, 'utf-8');
-      console.log(`📝 Updated markdown file: ${path.basename(id)}`);
+      logger.debug(`📝 Updated markdown file: ${path.basename(id)}`);
     } catch (error) {
-      console.error('❌ Failed to update content:', error);
+      logger.error('❌ Failed to update content:', error);
       throw error;
     }
   }
@@ -138,7 +139,7 @@ export class MarkdownAdapter implements IPlatformAdapter {
       if ((error as { code?: string }).code === 'ENOENT') {
         return null;
       }
-      console.error('❌ Failed to get content:', error);
+      logger.error('❌ Failed to get content:', error);
       throw error;
     }
   }
@@ -158,7 +159,7 @@ export class MarkdownAdapter implements IPlatformAdapter {
 
       return true;
     } catch (error) {
-      console.warn(`⚠️ Markdown adapter health check failed:`, error);
+      logger.warn(`⚠️ Markdown adapter health check failed:`, error);
       return false;
     }
   }
@@ -315,9 +316,73 @@ export class MarkdownAdapter implements IPlatformAdapter {
         }
       }
     } catch (error) {
-      console.warn(`⚠️ Could not read directory ${dir}:`, error);
+      logger.warn(`⚠️ Could not read directory ${dir}:`, error);
     }
 
     return files;
+  }
+
+  /**
+   * Get platform-specific metadata
+   */
+  async getMetadata(): Promise<PlatformMetadata> {
+    return {
+      name: 'Markdown Adapter',
+      version: '1.0.0',
+      capabilities: {
+        supportsLinks: true,
+        supportsTags: true,
+        supportsImages: false,
+        supportsMarkdown: true,
+        supportsSearch: true,
+        supportsBulkOperations: true,
+        supportsVersioning: false,
+        supportsBacklinks: true,
+      },
+      limits: {
+        maxContentSize: 10 * 1024 * 1024, // 10MB
+        maxLinksPerItem: 100,
+        maxTagsPerItem: 50,
+        rateLimitPerMinute: 1000,
+        bulkOperationLimit: 100,
+      },
+      configuration: {
+        baseDirectory: this.baseDirectory,
+        format: 'markdown',
+      },
+    };
+  }
+
+  /**
+   * Bulk operations for performance
+   */
+  async bulkCreateContent(contents: FormattedContent[]): Promise<string[]> {
+    const results: string[] = [];
+    for (const content of contents) {
+      try {
+        const id = await this.createContent(content);
+        results.push(id);
+      } catch (error) {
+        logger.warn(`⚠️ Failed to create content "${content.title}":`, error);
+        results.push(''); // Failed creation
+      }
+    }
+    return results;
+  }
+
+  /**
+   * Export content from platform
+   */
+  async exportContent(_options?: ExportOptions): Promise<ExistingContent[]> {
+    // For markdown adapter, export is the same as searching all content
+    return this.searchExisting(''); // Empty query returns all content
+  }
+
+  /**
+   * Import content to platform
+   */
+  async importContent(contents: FormattedContent[]): Promise<string[]> {
+    // For markdown adapter, import is the same as bulk create
+    return this.bulkCreateContent(contents);
   }
 }

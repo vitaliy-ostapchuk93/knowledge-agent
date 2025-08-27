@@ -6,7 +6,7 @@
  */
 
 import { readFileSync } from 'fs';
-import { ARCHITECTURE_CONFIG } from './test-utils';
+import { ARCHITECTURE_CONFIG } from '@/tests/utils/architecture-utils.ts';
 
 export class SolidTestUtils {
   /**

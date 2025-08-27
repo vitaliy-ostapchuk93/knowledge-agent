@@ -32,10 +32,6 @@ describe('Platform Adaptation Layer Building Block', () => {
       });
     }
 
-    if (foundComponents.length > 0) {
-      console.log('Found platform adapter components:', foundComponents);
-    }
-
     expect(adapterFiles.length).toBeGreaterThanOrEqual(0);
   });
 
@@ -55,10 +51,6 @@ describe('Platform Adaptation Layer Building Block', () => {
           foundPlatforms.push(platform);
         }
       });
-    }
-
-    if (foundPlatforms.length > 0) {
-      console.log('Found platform adapters:', foundPlatforms);
     }
 
     // Should have at least one platform adapter implementation
@@ -146,10 +138,6 @@ describe('Cache Management Layer Building Block', () => {
           foundComponents.push(component);
         }
       });
-    }
-
-    if (foundComponents.length > 0) {
-      console.log('Found cache components:', foundComponents);
     }
 
     expect(cacheFiles.length).toBeGreaterThanOrEqual(0);
@@ -248,10 +236,6 @@ describe('Event Bus Building Block', () => {
       });
     }
 
-    if (foundComponents.length > 0) {
-      console.log('Found event bus components:', foundComponents);
-    }
-
     expect(eventFiles.length).toBeGreaterThanOrEqual(0);
   });
 
@@ -342,10 +326,6 @@ describe('Knowledge Integration Engine Building Block', () => {
           foundComponents.push(component);
         }
       });
-    }
-
-    if (foundComponents.length > 0) {
-      console.log('Found integration components:', foundComponents);
     }
 
     // Integration layer might not exist yet, that's acceptable

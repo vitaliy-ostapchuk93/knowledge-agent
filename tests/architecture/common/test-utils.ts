@@ -8,6 +8,22 @@
 import { readdirSync, statSync, readFileSync } from 'fs';
 import { join } from 'path';
 
+// Common paths used across tests
+export const PATHS = {
+  rootDir: process.cwd(),
+  srcDir: join(process.cwd(), 'src'),
+  testsDir: join(process.cwd(), 'tests'),
+  testDataDir: join(process.cwd(), 'tests', 'data'),
+  interfacesDir: join(process.cwd(), 'src', 'interfaces'),
+  typesDir: join(process.cwd(), 'src', 'types'),
+  coreDir: join(process.cwd(), 'src', 'core'),
+  discoveryDir: join(process.cwd(), 'src', 'discovery'),
+  aiDir: join(process.cwd(), 'src', 'ai'),
+  cacheDir: join(process.cwd(), 'src', 'cache'),
+  eventsDir: join(process.cwd(), 'src', 'events'),
+  adaptersDir: join(process.cwd(), 'src', 'adapters'),
+};
+
 // Configuration based on building blocks documentation
 export const ARCHITECTURE_CONFIG = {
   // Layer definitions from building blocks
@@ -53,7 +69,7 @@ export const ARCHITECTURE_CONFIG = {
 
   // Naming conventions
   naming: {
-    interfaces: /^I[A-Z]/,
+    interfaces: /^[a-z-]+\.ts$/, // kebab-case interface files
     adapters: /[Aa]dapter/,
     strategies: /[Ss]trategy/,
   },
@@ -72,13 +88,11 @@ export const ARCHITECTURE_CONFIG = {
 
 // Common file system utilities
 export class FileSystemUtils {
-  private static srcPath = join(__dirname, '../../../src');
-
   /**
    * Get all TypeScript files in the workspace
    */
   static getAllTypeScriptFiles(): string[] {
-    return this.getAllTypeScriptFilesInDir(this.srcPath);
+    return this.getAllTypeScriptFilesInDir(PATHS.srcDir);
   }
 
   /**
@@ -111,7 +125,7 @@ export class FileSystemUtils {
    * Get files in a specific layer
    */
   static getFilesInLayer(layerName: string): string[] {
-    const layerPath = join(this.srcPath, layerName);
+    const layerPath = join(PATHS.srcDir, layerName);
     return this.getAllTypeScriptFilesInDir(layerPath);
   }
 
@@ -179,7 +193,7 @@ export class FileSystemUtils {
    * Get the layer name from a file path
    */
   static getLayerFromPath(filePath: string): string {
-    const relativePath = filePath.replace(this.srcPath, '').replace(/\\/g, '/');
+    const relativePath = filePath.replace(PATHS.srcDir, '').replace(/\\/g, '/');
     const parts = relativePath.split('/').filter(Boolean);
     return parts[0] || '';
   }

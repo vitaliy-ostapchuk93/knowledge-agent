@@ -1,13 +1,15 @@
 /**
  * Cross-Cutting Concerns Architecture Tests
  *
- * Tests for cross-cutting concerns as defined in docs/05-building-blocks.md Section 5.9
+ * Tests for cross-cutting concerns       // Should have minimal direct console usage in production code
+      expect(violations.length).toBe(0);ned in docs/05-building-blocks.md Section 5.9
  * Covers logging, error handling, security, configuration, and performance monitoring
  */
 
 import { describe, test, expect } from 'bun:test';
 import { readFileSync } from 'fs';
-import { FileSystemUtils } from './common/test-utils';
+import { FileSystemUtils } from '@/tests/utils/test-utils.ts';
+
 describe('Cross-Cutting Concerns Architecture', () => {
   describe('Logging and Observability', () => {
     test('should have logging infrastructure patterns', () => {
@@ -75,8 +77,9 @@ describe('Cross-Cutting Concerns Architecture', () => {
 
       for (const file of allFiles) {
         try {
-          // Skip test files and demo files
-          if (file.includes('test') || file.includes('demo')) continue;
+          // Skip test files, demo files, entry points, setup files, and logger utility
+          if (file.includes('test') || file.endsWith('index.ts') || file.endsWith('logger.ts'))
+            continue;
 
           const content = readFileSync(file, 'utf-8'); // Check for direct console.log usage (simple pattern)
           if (content.includes('console.log') || content.includes('console.error')) {
@@ -87,12 +90,8 @@ describe('Cross-Cutting Concerns Architecture', () => {
         }
       }
 
-      // Allow some direct console usage for early development
-      expect(violations.length).toBeLessThanOrEqual(10);
-
-      if (violations.length > 0) {
-        console.warn('Direct console usage found:', violations.slice(0, 3));
-      }
+      // Should have minimal direct console usage in production code
+      expect(violations.length).toBeLessThanOrEqual(0);
     });
   });
 

@@ -1,5 +1,5 @@
-import { DiscoveredContent } from '@/types/index.js';
-import { MockDataLoader } from '@/tests/utils/mock-data-loader.js';
+import { DiscoveredContent } from '@/types/index.ts';
+import { MockDataLoader } from '@/tests/utils/mock-data-loader.ts';
 
 export interface RedditDiscoveryOptions {
   maxResults?: number;

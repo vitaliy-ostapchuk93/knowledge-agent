@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeAll, afterAll } from 'bun:test';
-import { KnowledgeAgent } from '@/core/knowledge-agent.js';
-import { MarkdownAdapter } from '@/adapters/markdown-adapter.js';
-import { MemoryCacheManager } from '@/cache/memory-cache-manager.js';
-import { SimpleEventBus } from '@/events/simple-event-bus.js';
-import { MockAIStrategy } from '@/ai/mock-ai-strategy.js';
-import { MockContentDiscovery } from '@/discovery/mock-content-discovery.js';
+import { KnowledgeAgent } from '@/core/knowledge-agent.ts';
+import { MarkdownAdapter } from '@/adapters/markdown-adapter.ts';
+import { MemoryCacheManager } from '@/cache/memory-cache-manager.ts';
+import { SimpleEventBus } from '@/events/simple-event-bus.ts';
+import { MockAIStrategy } from '@/ai/mock-ai-strategy.ts';
+import { MockContentDiscovery } from '@/discovery/mock-content-discovery.ts';
 import { PlatformType, SummaryStrategy } from '@/types';
 import { promises as fs } from 'fs';
 import path from 'path';
@@ -49,8 +49,6 @@ describe('Universal Knowledge Agent MVP', () => {
       eventBus,
       mockContentDiscovery
     );
-
-    console.log('Setting up tests...');
   });
 
   afterAll(async () => {
@@ -61,7 +59,6 @@ describe('Universal Knowledge Agent MVP', () => {
     } catch {
       // Ignore cleanup errors
     }
-    console.log('Cleaning up tests...');
   });
 
   it('should initialize successfully', async () => {
@@ -77,7 +74,7 @@ describe('Universal Knowledge Agent MVP', () => {
   it('should summarize content', async () => {
     const discovery = await agent.discoverContent('test query');
     const summary = await agent.summarizeContent(discovery.items, SummaryStrategy.DETAILED);
-    
+
     expect(summary).toBeDefined();
     expect(summary.summary).toBeTruthy();
     expect(summary.keyPoints).toBeDefined();
@@ -86,16 +83,16 @@ describe('Universal Knowledge Agent MVP', () => {
   it('should integrate knowledge into platform', async () => {
     const discovery = await agent.discoverContent('integration test');
     const summary = await agent.summarizeContent(discovery.items);
-    
+
     await agent.integrateKnowledge(summary, PlatformType.OBSIDIAN);
-    
+
     // Verify file was created (basic integration test)
     expect(summary.id).toBeTruthy();
   });
 
   it('should complete full workflow', async () => {
     const summary = await agent.processQuery('workflow test', PlatformType.OBSIDIAN);
-    
+
     expect(summary).toBeDefined();
     expect(summary.summary).toBeTruthy();
     expect(summary.keyPoints).toBeDefined();
@@ -118,13 +115,13 @@ describe('Universal Knowledge Agent MVP', () => {
 
   it('should handle events correctly', async () => {
     let eventCount = 0;
-    
+
     eventBus.subscribe('discovery.completed', () => {
       eventCount++;
     });
 
     await agent.discoverContent('event test');
-    
+
     expect(eventCount).toBe(1);
   });
 });

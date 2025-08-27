@@ -5,36 +5,37 @@
  * It demonstrates the MVP implementation with a comprehensive demo.
  */
 
-import { runMVPDemo } from './demo/demo.js';
+import { runMVPDemo } from '@/demo/demo.ts';
+import { logger } from '@/utils/logger.ts';
 
-console.log('🚀 Universal Knowledge Agent - MVP Implementation');
+logger.debug('🚀 Universal Knowledge Agent - MVP Implementation');
 
 // Basic demonstration of the system
 async function main() {
   try {
-    console.log('📋 System Configuration:');
-    console.log(`- Runtime: ${process.versions.bun ? 'Bun' : 'Node.js'}`);
-    console.log(`- Version: ${process.versions.bun || process.versions.node}`);
-    console.log(`- Platform: ${process.platform}`);
-    console.log(`- Architecture: ${process.arch}`);
+    logger.debug('📋 System Configuration:');
+    logger.debug(`- Runtime: ${process.versions.bun ? 'Bun' : 'Node.js'}`);
+    logger.debug(`- Version: ${process.versions.bun || process.versions.node}`);
+    logger.debug(`- Platform: ${process.platform}`);
+    logger.debug(`- Architecture: ${process.arch}`);
 
     // Check for OpenAI API key
     if (process.env.OPENAI_API_KEY) {
-      console.log('🤖 OpenAI API key detected - will use real AI processing');
+      logger.debug('🤖 OpenAI API key detected - will use real AI processing');
     } else {
-      console.log('🎭 No OpenAI API key - will use mock AI processing for demo');
-      console.log('   Set OPENAI_API_KEY environment variable for full functionality');
+      logger.debug('🎭 No OpenAI API key - will use mock AI processing for demo');
+      logger.debug('   Set OPENAI_API_KEY environment variable for full functionality');
     }
 
-    console.log('\n' + '='.repeat(60));
+    logger.debug('\n' + '='.repeat(60));
 
     // Run the comprehensive MVP demo
     await runMVPDemo();
-    
-    console.log('\n🎯 System completed successfully! Exiting...');
+
+    logger.debug('\n🎯 System completed successfully! Exiting...');
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error running Knowledge Agent:', error);
+    logger.error('❌ Error running Knowledge Agent:', error);
     process.exit(1);
   }
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
-import { MemoryCacheManager } from '@/cache/memory-cache-manager.js';
+import { MemoryCacheManager } from '@/cache/memory-cache-manager.ts';
 
 describe('MemoryCacheManager', () => {
   let cacheManager: MemoryCacheManager;

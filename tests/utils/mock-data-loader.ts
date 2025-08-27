@@ -1,4 +1,5 @@
 import { DiscoveredContent, ContentSource } from '@/types';
+import { PATHS } from '@/tests/utils/test-utils.ts';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -7,13 +8,11 @@ import { join } from 'path';
  * Provides consistent, high-quality test data for discovery components
  */
 export class MockDataLoader {
-  private static dataPath = join(__dirname, '../data');
-
   /**
    * Load mock web content
    */
   static loadWebContent(): DiscoveredContent[] {
-    const filePath = join(this.dataPath, 'mock-web-content.json');
+    const filePath = join(PATHS.testDataDir, 'mock-web-content.json');
     const content = readFileSync(filePath, 'utf-8');
     return JSON.parse(content);
   }
@@ -22,7 +21,7 @@ export class MockDataLoader {
    * Load mock YouTube content
    */
   static loadYouTubeContent(): DiscoveredContent[] {
-    const filePath = join(this.dataPath, 'mock-youtube-content.json');
+    const filePath = join(PATHS.testDataDir, 'mock-youtube-content.json');
     const content = readFileSync(filePath, 'utf-8');
     return JSON.parse(content);
   }
@@ -31,7 +30,7 @@ export class MockDataLoader {
    * Load mock Reddit content
    */
   static loadRedditContent(): DiscoveredContent[] {
-    const filePath = join(this.dataPath, 'mock-reddit-content.json');
+    const filePath = join(PATHS.testDataDir, 'mock-reddit-content.json');
     const content = readFileSync(filePath, 'utf-8');
     return JSON.parse(content);
   }
@@ -40,7 +39,7 @@ export class MockDataLoader {
    * Load mock GitHub content
    */
   static loadGitHubContent(): DiscoveredContent[] {
-    const filePath = join(this.dataPath, 'mock-github-content.json');
+    const filePath = join(PATHS.testDataDir, 'mock-github-content.json');
     const content = readFileSync(filePath, 'utf-8');
     return JSON.parse(content);
   }
@@ -49,7 +48,7 @@ export class MockDataLoader {
    * Load mock Stack Overflow content
    */
   static loadStackOverflowContent(): DiscoveredContent[] {
-    const filePath = join(this.dataPath, 'mock-stackoverflow-content.json');
+    const filePath = join(PATHS.testDataDir, 'mock-stackoverflow-content.json');
     const content = readFileSync(filePath, 'utf-8');
     return JSON.parse(content);
   }

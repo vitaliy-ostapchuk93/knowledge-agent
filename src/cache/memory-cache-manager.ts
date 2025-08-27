@@ -3,7 +3,8 @@
  * Provides basic caching functionality with TTL support
  */
 
-import { ICacheManager } from '@/interfaces/index.js';
+import { ICacheManager } from '@/interfaces/index.ts';
+import { logger } from '@/utils/logger.ts';
 
 interface ICacheEntry<T> {
   value: T;
@@ -105,7 +106,9 @@ export class MemoryCacheManager implements ICacheManager {
       this.cache.delete(key);
     }
 
-    console.log(`🗑️ Invalidated ${keysToDelete.length} cache entries matching pattern: ${pattern}`);
+    logger.debug(
+      `🗑️ Invalidated ${keysToDelete.length} cache entries matching pattern: ${pattern}`
+    );
   }
 
   /**
@@ -130,7 +133,7 @@ export class MemoryCacheManager implements ICacheManager {
     this.cache.clear();
     this.stats.hits = 0;
     this.stats.misses = 0;
-    console.log('🗑️ Cache cleared');
+    logger.debug('🗑️ Cache cleared');
   }
 
   /**
@@ -148,7 +151,7 @@ export class MemoryCacheManager implements ICacheManager {
     }
 
     if (removedCount > 0) {
-      console.log(`🧹 Cleaned up ${removedCount} expired cache entries`);
+      logger.debug(`🧹 Cleaned up ${removedCount} expired cache entries`);
     }
   }
 
@@ -168,7 +171,7 @@ export class MemoryCacheManager implements ICacheManager {
 
     if (oldestKey) {
       this.cache.delete(oldestKey);
-      console.log(`♻️ Evicted oldest cache entry: ${oldestKey}`);
+      logger.debug(`♻️ Evicted oldest cache entry: ${oldestKey}`);
     }
   }
 

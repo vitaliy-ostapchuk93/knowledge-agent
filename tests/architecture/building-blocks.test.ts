@@ -40,11 +40,6 @@ describe('Core Knowledge Agent Building Block', () => {
 
     // At least some core components should exist for a mature architecture
     expect(foundComponents.length).toBeGreaterThan(0);
-
-    // Log what we found for visibility
-    if (foundComponents.length > 0) {
-      console.log('Found core components:', foundComponents);
-    }
   });
 
   test('should have main Knowledge Agent orchestrator', () => {
@@ -191,11 +186,6 @@ describe('Content Discovery Layer Building Block', () => {
       });
     }
 
-    // Log discovery of components
-    if (foundComponents.length > 0) {
-      console.log('Found discovery components:', foundComponents);
-    }
-
     // For early development, just check that discovery layer exists
     expect(discoveryFiles.length).toBeGreaterThanOrEqual(0);
   });
@@ -215,11 +205,6 @@ describe('Content Discovery Layer Building Block', () => {
           foundSources.push(source);
         }
       });
-    }
-
-    // Log found source connectors
-    if (foundSources.length > 0) {
-      console.log('Found source connectors:', foundSources);
     }
 
     expect(foundSources.length).toBeGreaterThanOrEqual(0);
@@ -285,11 +270,6 @@ describe('AI Processing Pipeline Building Block', () => {
       });
     }
 
-    // Log AI components found
-    if (foundComponents.length > 0) {
-      console.log('Found AI components:', foundComponents);
-    }
-
     expect(aiFiles.length).toBeGreaterThanOrEqual(0);
   });
 
@@ -322,10 +302,6 @@ describe('AI Processing Pipeline Building Block', () => {
 
     // Should have at least some strategy implementation
     expect(foundStrategies.length).toBeGreaterThanOrEqual(0);
-
-    if (foundStrategies.length > 0) {
-      console.log('Found AI strategies:', foundStrategies);
-    }
   });
 
   test('should separate AI concerns from platform concerns', () => {

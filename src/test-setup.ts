@@ -3,11 +3,11 @@ import { beforeAll, afterAll } from 'bun:test';
 
 // Global test setup
 beforeAll(() => {
-  console.log('Setting up tests...');
+  // Test setup logic
 });
 
 afterAll(() => {
-  console.log('Cleaning up tests...');
+  // Test cleanup logic
 });
 
 // Mock environment variables for testing

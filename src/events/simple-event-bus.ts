@@ -3,8 +3,9 @@
  * Provides publish-subscribe functionality for loose coupling
  */
 
-import { IEventBus } from '@/interfaces/index.js';
-import { Event } from '@/types/index.js';
+import { IEventBus } from '@/interfaces/index.ts';
+import { Event } from '@/types/index.ts';
+import { logger } from '@/utils/logger.ts';
 
 type EventHandler<T = unknown> = (data: T) => void;
 type EventHandlerGeneric = (event: Event) => void;
@@ -51,13 +52,13 @@ export class SimpleEventBus implements IEventBus {
           }
         }
       } catch (error) {
-        console.error(`❌ Error in event handler for ${event.type}:`, error);
+        logger.error(`❌ Error in event handler for ${event.type}:`, error);
       }
     }
 
     // Log important events
     if (this.isImportantEvent(event.type)) {
-      console.log(`📢 Event: ${event.type} from ${event.source}`);
+      logger.debug(`Event: ${event.type} from ${event.source}`);
     }
   }
 
@@ -73,7 +74,7 @@ export class SimpleEventBus implements IEventBus {
       handler: handler as EventHandler,
     });
 
-    console.log(`🔔 Subscribed to ${eventType} (${subscriptionId})`);
+    logger.debug(`Subscribed to ${eventType} (${subscriptionId})`);
     return subscriptionId;
   }
 
@@ -84,7 +85,7 @@ export class SimpleEventBus implements IEventBus {
     const subscription = this.subscriptions.get(subscriptionId);
     if (subscription) {
       this.subscriptions.delete(subscriptionId);
-      console.log(`🔕 Unsubscribed ${subscriptionId} from ${subscription.eventType || 'pattern'}`);
+      logger.debug(`Unsubscribed ${subscriptionId} from ${subscription.eventType || 'pattern'}`);
     }
   }
 
@@ -100,7 +101,7 @@ export class SimpleEventBus implements IEventBus {
       handler: handler as EventHandlerGeneric,
     });
 
-    console.log(`🔔 Subscribed to pattern ${pattern.source} (${subscriptionId})`);
+    logger.debug(`🔔 Subscribed to pattern ${pattern.source} (${subscriptionId})`);
     return subscriptionId;
   }
 
@@ -128,7 +129,7 @@ export class SimpleEventBus implements IEventBus {
   clearSubscriptions(): void {
     const count = this.subscriptions.size;
     this.subscriptions.clear();
-    console.log(`🗑️ Cleared ${count} subscriptions`);
+    logger.debug(`🗑️ Cleared ${count} subscriptions`);
   }
 
   /**
@@ -137,7 +138,7 @@ export class SimpleEventBus implements IEventBus {
   clearHistory(): void {
     const count = this.eventHistory.length;
     this.eventHistory = [];
-    console.log(`🗑️ Cleared ${count} events from history`);
+    logger.debug(`🗑️ Cleared ${count} events from history`);
   }
 
   /**

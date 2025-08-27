@@ -1,17 +1,16 @@
 import { describe, expect, it, beforeEach, afterEach } from 'bun:test';
-import { YouTubeDiscovery } from '@/discovery/youtube-discovery.js';
-import { ContentSource } from '@/types/index.js';
+import { YouTubeDiscovery } from '@/discovery/youtube-discovery.ts';
+import { ContentSource } from '@/types/index.ts';
 
 describe('YouTube Discovery', () => {
   let youtubeDiscovery: YouTubeDiscovery;
 
   beforeEach(() => {
-    console.log('Setting up tests...');
     youtubeDiscovery = new YouTubeDiscovery();
   });
 
   afterEach(() => {
-    console.log('Cleaning up tests...');
+    // Cleanup if needed
   });
 
   it('should discover YouTube content successfully', async () => {
@@ -21,7 +20,7 @@ describe('YouTube Discovery', () => {
     expect(results).toBeDefined();
     expect(Array.isArray(results)).toBe(true);
     expect(results.length).toBeGreaterThan(0);
-    
+
     // Verify structure
     const firstResult = results[0];
     expect(firstResult.title).toBeDefined();
@@ -36,7 +35,7 @@ describe('YouTube Discovery', () => {
     const results = await youtubeDiscovery.discover(query);
 
     expect(results.length).toBeGreaterThan(0);
-    
+
     const firstResult = results[0];
     expect(firstResult.metadata).toHaveProperty('channel');
     expect(firstResult.metadata).toHaveProperty('duration');
@@ -62,7 +61,7 @@ describe('YouTube Discovery', () => {
 
     expect(Array.isArray(relevanceResults)).toBe(true);
     expect(Array.isArray(viewResults)).toBe(true);
-    
+
     if (relevanceResults.length > 0 && viewResults.length > 0) {
       // Results should be sorted differently
       expect(relevanceResults[0].relevanceScore).toBeGreaterThan(0);
@@ -75,11 +74,11 @@ describe('YouTube Discovery', () => {
 
     expect(Array.isArray(trending)).toBe(true);
     expect(trending.length).toBeLessThanOrEqual(5);
-    
+
     if (trending.length > 1) {
       // Should be sorted by view count
-      const firstViews = trending[0].metadata.viewCount as number || 0;
-      const secondViews = trending[1].metadata.viewCount as number || 0;
+      const firstViews = (trending[0].metadata.viewCount as number) || 0;
+      const secondViews = (trending[1].metadata.viewCount as number) || 0;
       expect(firstViews).toBeGreaterThanOrEqual(secondViews);
     }
   });

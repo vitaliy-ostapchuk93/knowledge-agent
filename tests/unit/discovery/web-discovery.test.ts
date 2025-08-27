@@ -1,17 +1,16 @@
 import { describe, expect, it, beforeEach, afterEach } from 'bun:test';
-import { WebDiscovery } from '@/discovery/web-discovery.js';
-import { ContentSource } from '@/types/index.js';
+import { WebDiscovery } from '@/discovery/web-discovery.ts';
+import { ContentSource } from '@/types/index.ts';
 
 describe('Web Discovery', () => {
   let webDiscovery: WebDiscovery;
 
   beforeEach(() => {
-    console.log('Setting up tests...');
     webDiscovery = new WebDiscovery();
   });
 
   afterEach(() => {
-    console.log('Cleaning up tests...');
+    // Cleanup if needed
   });
 
   it('should discover web content successfully', async () => {

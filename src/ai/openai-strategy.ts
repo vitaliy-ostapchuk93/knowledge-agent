@@ -3,7 +3,7 @@
  * Handles AI-powered content summarization and analysis using OpenAI's API
  */
 
-import { IProcessingStrategy } from '@/interfaces/index.js';
+import { IProcessingStrategy } from '@/interfaces/index.ts';
 import {
   Summary,
   ProcessingStrategy,
@@ -11,8 +11,9 @@ import {
   Analysis,
   CodeExample,
   RelatedLink,
-} from '@/types/index.js';
+} from '@/types/index.ts';
 import OpenAI from 'openai';
+import { logger } from '@/utils/logger.ts';
 
 export class OpenAIStrategy implements IProcessingStrategy {
   readonly strategyType = ProcessingStrategy.CLOUD;
@@ -64,10 +65,10 @@ export class OpenAIStrategy implements IProcessingStrategy {
         actionableItems: parsedSummary.actionableItems,
       };
 
-      console.log(`🤖 Generated AI summary (${summaryText.length} chars)`);
+      logger.debug(`🤖 Generated AI summary (${summaryText.length} chars)`);
       return summary;
     } catch (error) {
-      console.error('❌ OpenAI summarization failed:', error);
+      logger.error('❌ Action item generation failed:', error);
       throw new Error(`AI summarization failed: ${(error as Error).message}`);
     }
   }
@@ -100,7 +101,7 @@ export class OpenAIStrategy implements IProcessingStrategy {
 
       try {
         const analysis = JSON.parse(analysisText) as Analysis;
-        console.log(
+        logger.debug(
           `🔍 Analyzed content: ${analysis.complexity} complexity, ${analysis.topics.length} topics`
         );
         return analysis;
@@ -115,7 +116,7 @@ export class OpenAIStrategy implements IProcessingStrategy {
         };
       }
     } catch (error) {
-      console.error('❌ Content analysis failed:', error);
+      logger.error('❌ Content analysis failed:', error);
       throw new Error(`Content analysis failed: ${(error as Error).message}`);
     }
   }
@@ -147,7 +148,7 @@ export class OpenAIStrategy implements IProcessingStrategy {
         return this.extractSimpleKeyPoints(content);
       }
     } catch (error) {
-      console.error('❌ Key point extraction failed:', error);
+      logger.error('❌ Key point extraction failed:', error);
       return this.extractSimpleKeyPoints(content);
     }
   }
@@ -183,7 +184,7 @@ export class OpenAIStrategy implements IProcessingStrategy {
         ];
       }
     } catch (error) {
-      console.error('❌ Action item generation failed:', error);
+      logger.error('❌ Action item generation failed:', error);
       return [
         'Review the content thoroughly',
         'Take notes on important points',
@@ -205,7 +206,7 @@ export class OpenAIStrategy implements IProcessingStrategy {
       });
       return true;
     } catch (error) {
-      console.warn('⚠️ OpenAI strategy not available:', (error as Error).message);
+      logger.warn('⚠️ OpenAI strategy not available:', (error as Error).message);
       return false;
     }
   }

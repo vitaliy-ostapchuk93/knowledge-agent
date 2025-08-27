@@ -3,7 +3,8 @@
  * Automatically detects relationships between content and creates bidirectional links
  */
 
-import { DiscoveredContent } from '@/types/index.js';
+import { DiscoveredContent } from '@/types/index.ts';
+import { logger } from '@/utils/logger.ts';
 
 export interface KnowledgeLink {
   sourceId: string;
@@ -37,19 +38,22 @@ export class KnowledgeLinkingEngine {
   /**
    * Add content to the knowledge graph and detect links
    */
-  async addContent(content: DiscoveredContent, options: LinkingOptions = {}): Promise<KnowledgeLink[]> {
-    console.log(`🔗 Adding content to knowledge graph: "${content.title}"`);
-    
+  async addContent(
+    content: DiscoveredContent,
+    options: LinkingOptions = {}
+  ): Promise<KnowledgeLink[]> {
+    logger.debug(`🔗 Adding content to knowledge graph: "${content.title}"`);
+
     // Add to graph
     this.knowledgeGraph.nodes.set(content.id, content);
-    
+
     // Detect links with existing content
     const newLinks = await this.detectLinks(content, options);
-    
+
     // Add links to graph
     this.knowledgeGraph.links.push(...newLinks);
-    
-    console.log(`🔗 Found ${newLinks.length} new links for "${content.title}"`);
+
+    logger.debug(`🔗 Found ${newLinks.length} new links for "${content.title}"`);
     return newLinks;
   }
 
@@ -106,9 +110,7 @@ export class KnowledgeLinkingEngine {
     }
 
     // Sort by strength and limit
-    return links
-      .sort((a, b) => b.strength - a.strength)
-      .slice(0, maxLinks);
+    return links.sort((a, b) => b.strength - a.strength).slice(0, maxLinks);
   }
 
   /**
@@ -228,18 +230,21 @@ export class KnowledgeLinkingEngine {
   /**
    * Calculate tag overlap between two content items
    */
-  private calculateTagOverlap(tags1: string[], tags2: string[]): {
+  private calculateTagOverlap(
+    tags1: string[],
+    tags2: string[]
+  ): {
     score: number;
     commonTags: string[];
   } {
     const set1 = new Set(tags1.map(tag => tag.toLowerCase()));
     const set2 = new Set(tags2.map(tag => tag.toLowerCase()));
-    
+
     const intersection = new Set([...set1].filter(tag => set2.has(tag)));
     const union = new Set([...set1, ...set2]);
-    
+
     const score = intersection.size / union.size;
-    
+
     return {
       score,
       commonTags: Array.from(intersection),
@@ -249,16 +254,19 @@ export class KnowledgeLinkingEngine {
   /**
    * Calculate content similarity using keyword analysis
    */
-  private calculateContentSimilarity(content1: string, content2: string): {
+  private calculateContentSimilarity(
+    content1: string,
+    content2: string
+  ): {
     score: number;
     commonConcepts: string[];
   } {
     // Extract keywords from both contents
     const keywords1 = this.extractKeywords(content1);
     const keywords2 = this.extractKeywords(content2);
-    
+
     const overlap = this.calculateTagOverlap(keywords1, keywords2);
-    
+
     return {
       score: overlap.score,
       commonConcepts: overlap.commonTags,
@@ -271,19 +279,36 @@ export class KnowledgeLinkingEngine {
   private extractKeywords(content: string): string[] {
     // Technical terms pattern
     const techTerms = content.match(/\b[A-Z][a-zA-Z]{3,}\b/g) || [];
-    
+
     // Common programming concepts
     const commonConcepts = [
-      'api', 'database', 'component', 'function', 'class', 'method', 'interface',
-      'framework', 'library', 'service', 'module', 'package', 'dependency',
-      'authentication', 'authorization', 'middleware', 'routing', 'testing',
-      'deployment', 'performance', 'security', 'optimization', 'caching',
+      'api',
+      'database',
+      'component',
+      'function',
+      'class',
+      'method',
+      'interface',
+      'framework',
+      'library',
+      'service',
+      'module',
+      'package',
+      'dependency',
+      'authentication',
+      'authorization',
+      'middleware',
+      'routing',
+      'testing',
+      'deployment',
+      'performance',
+      'security',
+      'optimization',
+      'caching',
     ];
-    
-    const foundConcepts = commonConcepts.filter(concept =>
-      content.toLowerCase().includes(concept)
-    );
-    
+
+    const foundConcepts = commonConcepts.filter(concept => content.toLowerCase().includes(concept));
+
     return [...techTerms, ...foundConcepts]
       .filter((term, index, array) => array.indexOf(term) === index)
       .slice(0, 10); // Limit to top 10 keywords
@@ -303,12 +328,12 @@ export class KnowledgeLinkingEngine {
       { from: 'angular', to: 'typescript', strength: 0.9 },
       { from: 'nextjs', to: 'react', strength: 0.9 },
       { from: 'nuxt', to: 'vue', strength: 0.9 },
-      
+
       // Backend dependencies
       { from: 'express', to: 'nodejs', strength: 0.9 },
       { from: 'nestjs', to: 'nodejs', strength: 0.8 },
       { from: 'fastify', to: 'nodejs', strength: 0.8 },
-      
+
       // Database dependencies
       { from: 'mongoose', to: 'mongodb', strength: 0.9 },
       { from: 'prisma', to: 'database', strength: 0.7 },
@@ -353,7 +378,8 @@ export class KnowledgeLinkingEngine {
    * Check if content mentions a specific technology/concept
    */
   private contentMentions(content: DiscoveredContent, term: string): boolean {
-    const searchText = `${content.title} ${content.content} ${content.tags.join(' ')}`.toLowerCase();
+    const searchText =
+      `${content.title} ${content.content} ${content.tags.join(' ')}`.toLowerCase();
     return searchText.includes(term.toLowerCase());
   }
 
@@ -427,9 +453,11 @@ export class KnowledgeLinkingEngine {
   ): KnowledgeLink | null {
     // This would be more sophisticated in a real implementation
     // For now, we'll use simple keyword matching
-    
-    if (content1.title.toLowerCase().includes('javascript') && 
-        content2.title.toLowerCase().includes('typescript')) {
+
+    if (
+      content1.title.toLowerCase().includes('javascript') &&
+      content2.title.toLowerCase().includes('typescript')
+    ) {
       return {
         sourceId: content1.id,
         targetId: content2.id,
@@ -452,7 +480,7 @@ export class KnowledgeLinkingEngine {
   ): KnowledgeLink | null {
     // Look for version numbers in titles/content
     const versionPattern = /v?(\d+)\.(\d+)/g;
-    
+
     const content1Versions = Array.from(content1.title.matchAll(versionPattern));
     const content2Versions = Array.from(content2.title.matchAll(versionPattern));
 
@@ -489,10 +517,13 @@ export class KnowledgeLinkingEngine {
     averageLinks: number;
     linkTypes: Record<string, number>;
   } {
-    const linkTypes = this.knowledgeGraph.links.reduce((acc, link) => {
-      acc[link.linkType] = (acc[link.linkType] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const linkTypes = this.knowledgeGraph.links.reduce(
+      (acc, link) => {
+        acc[link.linkType] = (acc[link.linkType] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     return {
       nodeCount: this.knowledgeGraph.nodes.size,

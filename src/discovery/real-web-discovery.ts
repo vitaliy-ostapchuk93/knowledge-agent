@@ -3,7 +3,8 @@
  * Uses simple web scraping techniques (no API key required)
  */
 
-import { DiscoveredContent, ContentSource } from '@/types/index.js';
+import { DiscoveredContent, ContentSource } from '@/types/index.ts';
+import { logger } from '@/utils/logger.ts';
 
 export interface RealWebDiscoveryOptions {
   maxResults?: number;
@@ -21,7 +22,7 @@ export class RealWebDiscovery {
     }
 
     try {
-      console.log(`🔍 Searching web for: "${query}"`);
+      logger.debug(`🔍 Searching web for: "${query}"`);
 
       // For MVP, we'll create structured mock data that simulates real web results
       // In a real implementation, this would use search APIs or web scraping
@@ -48,10 +49,10 @@ export class RealWebDiscovery {
         filteredResults = filteredResults.slice(0, options.maxResults);
       }
 
-      console.log(`✅ Found ${filteredResults.length} real web results for "${query}"`);
+      logger.debug(`✅ Found ${filteredResults.length} real web results for "${query}"`);
       return filteredResults;
     } catch (error) {
-      console.error(`❌ Web discovery error for "${query}":`, error);
+      logger.error(`❌ Web discovery error for "${query}":`, error);
       return [];
     }
   }
@@ -182,7 +183,7 @@ export class RealWebDiscovery {
         const results = await this.discover(query, { maxResults: 2 });
         allResults.push(...results);
       } catch (error) {
-        console.warn(`Failed to get popular content for "${query}":`, error);
+        logger.warn(`Failed to get popular content for "${query}":`, error);
       }
     }
 

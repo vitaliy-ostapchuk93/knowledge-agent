@@ -8,8 +8,9 @@ import { watch, FSWatcher } from 'fs';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { EventEmitter } from 'events';
-import { IEventBus } from '@/interfaces/index.js';
-import { Event } from '@/types/index.js';
+import { IEventBus } from '@/interfaces/index.ts';
+import { Event } from '@/types/index.ts';
+import { logger } from '@/utils/logger.ts';
 
 export interface IFileSystemMonitor {
   /**
@@ -62,14 +63,14 @@ export class FileSystemMonitor extends EventEmitter implements IFileSystemMonito
    * Start monitoring specified directories
    */
   async startWatching(directories: string[]): Promise<void> {
-    console.log('👁️ Starting file system monitoring...');
+    logger.debug('👁️ Starting file system monitoring...');
 
     for (const directory of directories) {
       try {
         // Verify directory exists
         const stats = await fs.stat(directory);
         if (!stats.isDirectory()) {
-          console.warn(`⚠️ Skipping ${directory}: not a directory`);
+          logger.warn(`⚠️ Skipping ${directory}: not a directory`);
           continue;
         }
 
@@ -83,7 +84,7 @@ export class FileSystemMonitor extends EventEmitter implements IFileSystemMonito
         this.watchers.set(directory, watcher);
         this.watchedDirectories.add(directory);
 
-        console.log(`👁️ Watching directory: ${directory}`);
+        logger.debug(`👁️ Watching directory: ${directory}`);
 
         // Initial scan
         const files = await this.scanDirectory(directory);
@@ -91,7 +92,13 @@ export class FileSystemMonitor extends EventEmitter implements IFileSystemMonito
           this.publishFileEvent('added', file);
         }
       } catch (error) {
-        console.error(`❌ Failed to watch directory ${directory}:`, error);
+        // Handle directory access errors gracefully
+        const nodeError = error as NodeJS.ErrnoException;
+        if (nodeError?.code === 'ENOENT') {
+          logger.warn(`⚠️ Directory not found: ${directory}`);
+        } else {
+          logger.error(`❌ Failed to watch directory ${directory}:`, error);
+        }
       }
     }
 
@@ -105,18 +112,18 @@ export class FileSystemMonitor extends EventEmitter implements IFileSystemMonito
       },
     });
 
-    console.log(`✅ File system monitoring started for ${this.watchers.size} directories`);
+    logger.debug(`✅ File system monitoring started for ${this.watchers.size} directories`);
   }
 
   /**
    * Stop monitoring all directories
    */
   async stopWatching(): Promise<void> {
-    console.log('🛑 Stopping file system monitoring...');
+    logger.debug('🛑 Stopping file system monitoring...');
 
     for (const [directory, watcher] of this.watchers) {
       watcher.close();
-      console.log(`🛑 Stopped watching: ${directory}`);
+      logger.debug(`🛑 Stopped watching: ${directory}`);
     }
 
     this.watchers.clear();
@@ -129,7 +136,7 @@ export class FileSystemMonitor extends EventEmitter implements IFileSystemMonito
       data: { stoppedWatchers: this.watchers.size },
     });
 
-    console.log('✅ File system monitoring stopped');
+    logger.debug('✅ File system monitoring stopped');
   }
 
   /**
@@ -176,7 +183,7 @@ export class FileSystemMonitor extends EventEmitter implements IFileSystemMonito
       this.publishFileEvent(changeType as 'added' | 'changed' | 'removed', fileInfo);
     } catch {
       // File might have been deleted or moved
-      console.log(`📁 File change ignored: ${filePath}`);
+      logger.debug(`📁 File change ignored: ${filePath}`);
     }
   }
 
@@ -204,7 +211,7 @@ export class FileSystemMonitor extends EventEmitter implements IFileSystemMonito
         }
       }
     } catch (error) {
-      console.warn(`⚠️ Failed to scan directory ${directory}:`, error);
+      logger.warn(`⚠️ Failed to scan directory ${directory}:`, error);
     }
 
     return files;
@@ -331,7 +338,7 @@ export class FileSystemMonitor extends EventEmitter implements IFileSystemMonito
       },
     });
 
-    console.log(`📄 File ${type}: ${file.name} (${file.platform})`);
+    logger.debug(`📄 File ${type}: ${file.name} (${file.platform})`);
   }
 
   /**
