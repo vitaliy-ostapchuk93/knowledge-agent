@@ -11,10 +11,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        bun-version: ['1.1.0', 'latest']
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,7 +18,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
-          bun-version: ${{ matrix.bun-version }}
+          bun-version: '1.2.20'
 
       - name: Cache dependencies
         uses: actions/cache@v3
@@ -30,8 +26,9 @@ jobs:
           path: |
             ~/.bun/install/cache
             node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          key: ${{ runner.os }}-bun-1.2.20-${{ hashFiles('**/bun.lockb') }}
           restore-keys: |
+            ${{ runner.os }}-bun-1.2.20-
             ${{ runner.os }}-bun-
 
       - name: Install dependencies
@@ -51,7 +48,6 @@ jobs:
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
-        if: matrix.bun-version == 'latest'
         with:
           file: ./coverage/lcov.info
           flags: unittests

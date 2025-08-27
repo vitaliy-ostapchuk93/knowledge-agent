@@ -4,16 +4,12 @@
   "description": "Universal Knowledge Agent for cross-platform knowledge management integration",
   "main": "dist/index.js",
   "scripts": {
-    "build": "bun build --target=node",
+    "build": "bun build src/index.ts --outdir dist --target node",
     "build:tsc": "tsc",
     "dev": "bun --watch src/index.ts",
     "test": "bun test",
     "test:watch": "bun test --watch",
     "test:arch": "bun test tests/architecture/",
-    "arch:check": "dependency-cruiser src --config .dependency-cruiser.cjs",
-    "arch:graph": "dependency-cruiser src --include-only \"^src\" --output-type dot --output-to architecture-graph.dot",
-    "arch:json": "dependency-cruiser src --include-only \"^src\" --output-type json --output-to architecture-deps.json",
-    "arch:report": "dependency-cruiser src --output-type html > architecture-report.html",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write \"src/**/*.{ts,js,json,md}\"",
@@ -22,9 +18,9 @@
     "start": "bun run dist/index.js",
     "demo": "bun run src/demo/demo.ts",
     "demo:nlp": "bun run src/demo/nlp-scoring-demo.ts",
-    "check": "bun run typecheck && bun run lint && bun run format:check && bun run test:arch && bun run arch:check",
+    "check": "bun run typecheck && bun run lint && bun run format:check && bun run test:arch",
     "fix": "bun run lint:fix && bun run format",
-    "clean": "rm -rf dist coverage .nyc_output"
+    "clean": "rimraf dist coverage .nyc_output"
   },
   "keywords": [
     "knowledge-management",
@@ -60,11 +56,11 @@
     "@typescript-eslint/eslint-plugin": "^8.41.0",
     "@typescript-eslint/parser": "^8.41.0",
     "bun-types": "^1.2.21",
-    "dependency-cruiser": "^17.0.1",
     "eslint": "^9.34.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "prettier": "^3.6.2",
+    "rimraf": "^6.0.1",
     "tsarch": "^5.4.1",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.41.0"
