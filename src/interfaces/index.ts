@@ -40,3 +40,8 @@ export type {
 // Cache and Event Interfaces
 export type { ICacheManager } from '@/interfaces/cache-manager.ts';
 export type { IEventBus } from '@/interfaces/event-bus.ts';
+
+// Taxonomy System Interfaces
+export type { ITaxonomyManager } from '@/interfaces/taxonomy-manager.ts';
+export type { LearningContext, ExternalValidator, ValidationResult } from '@/interfaces/taxonomy-learning.ts';
+export type { TermLearningConfig, TaxonomyMetrics } from '@/interfaces/taxonomy-config.ts';

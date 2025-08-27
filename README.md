@@ -2,11 +2,11 @@
 
 > An intelligent, privacy-first platform for automated knowledge discovery and synthesis
 
-[![Version](https://img.shields.io/github/package-json/v/vitaliy-ostapchuk93/knowledge-agent)](https://github.com/vitaliy-ostapchuk93/knowledge-agent)
-[![License](https://img.shields.io/github/license/vitaliy-ostapchuk93/knowledge-agent)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/blob/main/LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
-[![Bun](https://img.shields.io/badge/Bun-Powered-orange.svg)](https://bun.sh/)
-[![Downloads](https://img.shields.io/github/downloads/vitaliy-ostapchuk93/knowledge-agent/total)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/releases)
+[![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent)
+[![Architecture](https://img.shields.io/badge/Architecture-Compliant-blue.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
+[![Bun](https://img.shields.io/badge/Bun-1.0+-orange.svg)](https://bun.sh/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/blob/main/LICENSE)
 
 [**📥 Download Latest Release**](https://github.com/vitaliy-ostapchuk93/knowledge-agent/releases/latest) | [📖 Documentation](docs/) | [💬 Discussions](https://github.com/vitaliy-ostapchuk93/knowledge-agent/discussions)
 
@@ -132,36 +132,20 @@ export CACHE_TTL="3600"
 
 ## 🏗️ Architecture
 
-The system follows clean architecture principles with well-defined boundaries:
+The Universal Knowledge Agent uses a clean, modular design that's easy to extend and maintain:
 
-### Core Patterns
+- **Intelligent Discovery** - Automatically finds relevant content from multiple sources
+- **AI Processing** - Summarizes and extracts insights using configurable AI strategies  
+- **Smart Integration** - Links new content with your existing knowledge base
+- **Platform Adapters** - Works seamlessly with your preferred tools (Markdown, Logseq, Obsidian, Notion)
+- **Domain-Aware Taxonomy** - Learns and classifies technical terms intelligently
 
-1. **Strategy Pattern** - Pluggable content discovery and AI processing
-2. **Adapter Pattern** - Platform-specific integrations (Markdown, Logseq, Obsidian, Notion)
-3. **Observer Pattern** - Event-driven updates and notifications
-4. **Facade Pattern** - Unified interface for complex operations
-5. **Cache-Aside Pattern** - Intelligent caching for performance
+### Key Benefits
 
-### Key Components
-
-```typescript
-src/
-├── core/              # Core business logic
-│   ├── knowledge-agent.ts    # Main orchestrator
-│   └── file-system-monitor.ts
-├── discovery/         # Content discovery strategies
-│   ├── web-discovery.ts
-│   ├── reddit-discovery.ts
-│   └── youtube-discovery.ts
-├── ai/               # AI processing strategies
-│   ├── openai-strategy.ts
-│   └── mock-ai-strategy.ts
-├── adapters/         # Platform adapters
-│   └── markdown-adapter.ts
-├── cache/            # Caching implementations
-├── events/           # Event system
-└── interfaces/       # Core contracts and types
-```
+- **Modular Design** - Easy to customize and extend
+- **Multiple AI Strategies** - Choose between local processing or cloud services
+- **Platform Agnostic** - Works with any knowledge management tool
+- **Performance Optimized** - Intelligent caching and efficient processing
 
 ## 🔧 Configuration
 

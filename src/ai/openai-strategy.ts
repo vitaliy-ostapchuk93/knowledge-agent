@@ -17,7 +17,7 @@ import { OpenAI } from 'openai';
 import { WordTokenizer, SentimentAnalyzer, PorterStemmer as Stemmer, TfIdf } from 'natural';
 import { removeStopwords, eng } from 'stopword';
 import compromise from 'compromise';
-import { detectTechnicalTerms, assessContentComplexity } from '@/utils/terms-config.ts';
+import { /* detectTechnicalTerms, */ assessContentComplexity } from '@/utils/terms-config.ts';
 
 export class OpenAIStrategy implements IProcessingStrategy {
   readonly strategyType = ProcessingStrategy.CLOUD;

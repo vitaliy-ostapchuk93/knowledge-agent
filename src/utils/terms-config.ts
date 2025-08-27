@@ -1,7 +1,26 @@
 /**
  * Centralized Terms Configuration
- * All hardcoded arrays and term lists are managed here
+ * Static base terms with optional integration to Domain-Aware Taxonomy System
  */
+
+import { logger } from '@/utils/logger.ts';
+import { DomainTaxonomyManager } from '@/core/domain-taxonomy.ts';
+
+// Initialize taxonomy manager (optional for enhanced capabilities)
+let taxonomyManager: DomainTaxonomyManager | null = null;
+
+try {
+  taxonomyManager = new DomainTaxonomyManager({
+    minConfidence: 0.7,
+    minFrequency: 2,
+    maxLearnedTerms: 500,
+    enableExternalValidation: false, // Keep lightweight for terms-config
+    focusDomains: ['programming', 'data-science', 'design'],
+    excludeTerms: ['the', 'and', 'or', 'but', 'is', 'are'],
+  });
+} catch (error) {
+  logger.warn('Taxonomy manager initialization failed, using static terms only:', error);
+}
 
 export const TECHNICAL_TERMS = {
   // Programming languages and frameworks
@@ -473,9 +492,10 @@ export const EVENT_TERMS = {
 
 /**
  * Get all technical terms as a flat array
+ * Enhanced with taxonomy system when available
  */
 export function getAllTechnicalTerms(): string[] {
-  return [
+  const staticTerms = [
     ...TECHNICAL_TERMS.languages,
     ...TECHNICAL_TERMS.coreConcepts,
     ...TECHNICAL_TERMS.architecture,
@@ -484,6 +504,20 @@ export function getAllTechnicalTerms(): string[] {
     ...TECHNICAL_TERMS.frontend,
     ...TECHNICAL_TERMS.backend,
   ];
+
+  // Add learned terms if taxonomy system is available
+  if (taxonomyManager) {
+    try {
+      const learnedTerms = taxonomyManager.getTermsForDomain('programming')
+        .concat(taxonomyManager.getTermsForDomain('data-science'))
+        .map((term: any) => term.value);
+      return [...new Set([...staticTerms, ...learnedTerms])];
+    } catch (error) {
+      logger.debug('Failed to get learned terms, using static only:', error);
+    }
+  }
+
+  return staticTerms;
 }
 
 /**
@@ -522,8 +556,36 @@ export function getPlatformTerms(platform: 'reddit' | 'youtube' | 'github' | 'we
 
 /**
  * Detect if content contains technical terms
+ * Enhanced with taxonomy system when available
  */
 export function detectTechnicalTerms(content: string, tokens?: string[]): string[] {
+  // Use taxonomy system if available for classification
+  if (taxonomyManager) {
+    try {
+      const classification = taxonomyManager.classifyContent(content);
+      const techDomains = classification
+        .filter(c => c.domain === 'programming' || c.domain === 'data-science')
+        .filter(c => c.confidence > 0.5);
+      
+      if (techDomains.length > 0) {
+        // Get terms from technical domains
+        const technicalTerms: string[] = [];
+        techDomains.forEach(domain => {
+          const domainTerms = taxonomyManager!.getTermsForDomain(domain.domain)
+            .map((term: any) => term.value);
+          technicalTerms.push(...domainTerms);
+        });
+        
+        if (technicalTerms.length > 0) {
+          return [...new Set(technicalTerms)];
+        }
+      }
+    } catch (error) {
+      logger.debug('Failed to classify content using taxonomy, falling back to static:', error);
+    }
+  }
+
+  // Fallback to static term detection
   const contentLower = content.toLowerCase();
   const allTerms = getAllTechnicalTerms();
   const foundTerms: string[] = [];
@@ -549,8 +611,25 @@ export function detectTechnicalTerms(content: string, tokens?: string[]): string
 
 /**
  * Assess content complexity based on terms
+ * Enhanced with taxonomy system when available
  */
 export function assessContentComplexity(content: string): 'low' | 'medium' | 'high' {
+  // Use taxonomy system if available
+  if (taxonomyManager) {
+    try {
+      const classification = taxonomyManager.classifyContent(content);
+      const avgConfidence = classification.reduce((sum, c) => sum + c.confidence, 0) / classification.length;
+      
+      // Higher confidence in technical domains indicates higher complexity
+      if (avgConfidence > 0.8) return 'high';
+      if (avgConfidence > 0.5) return 'medium';
+      if (avgConfidence > 0.2) return 'low';
+    } catch (error) {
+      logger.debug('Failed to assess complexity using taxonomy, falling back to static:', error);
+    }
+  }
+
+  // Fallback to static complexity assessment
   const contentLower = content.toLowerCase();
 
   const complexTermsFound = TECHNICAL_TERMS.complex.filter(term =>

@@ -6,6 +6,8 @@ This section describes the static decomposition of the Universal Knowledge Agent
 
 ### 5.1.1 System Overview
 
+The Universal Knowledge Agent follows a layered architecture with clear data flow:
+
 ```mermaid
 graph TB
     subgraph "Universal Knowledge Agent System"
@@ -14,8 +16,7 @@ graph TB
         PROCESSING["🔄 AI Processing Pipeline"]
         INTEGRATION["🔗 Knowledge Integration Engine"]
         ADAPTERS["🔌 Platform Adaptation Layer"]
-        CACHE["💾 Cache Management Layer"]
-        EVENTS["📢 Event Bus"]
+        TAXONOMY["🏗️ Domain-Aware Taxonomy"]
     end
 
     EXT["🌐 External Sources"] --> DISCOVERY
@@ -24,14 +25,13 @@ graph TB
     INTEGRATION --> ADAPTERS
     ADAPTERS --> PLATFORMS["📱 Platforms"]
 
-    CACHE -.-> DISCOVERY
-    CACHE -.-> PROCESSING
-    CACHE -.-> INTEGRATION
+    CORE --> DISCOVERY
+    CORE --> PROCESSING
+    CORE --> INTEGRATION
 
-    EVENTS -.-> CORE
-    EVENTS -.-> DISCOVERY
-    EVENTS -.-> PROCESSING
-    EVENTS -.-> INTEGRATION
+    TAXONOMY --> DISCOVERY
+    TAXONOMY --> PROCESSING
+    TAXONOMY --> INTEGRATION
 ```
 
 ### 5.1.2 Contained Building Blocks
@@ -43,19 +43,19 @@ graph TB
 | **AI Processing Pipeline**       | Processes, summarizes, and extracts insights from content   | `IAIStrategy`, `IContentProcessor`         |
 | **Knowledge Integration Engine** | Connects new content with existing knowledge structures     | `IKnowledgeIntegrator`, `ILinkingEngine`   |
 | **Platform Adaptation Layer**    | Formats content for specific knowledge management platforms | `IPlatformAdapter`, `IContentFormatter`    |
-| **Cache Management Layer**       | Manages multi-level caching for performance optimization    | `ICacheManager`, `ICacheStrategy`          |
-| **Event Bus**                    | Enables loose coupling through event-driven communication   | `IEventBus`, `IEventHandler`               |
+| **Domain-Aware Taxonomy**        | Provides intelligent term classification and learning       | `ITaxonomyManager`, `TaxonomyTerm`         |
 
 ### 5.1.3 Important Interfaces
 
-| Interface             | Purpose                      | Abstracts                                 | Responsibilities                                                                               |
-| --------------------- | ---------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| **IKnowledgeAgent**   | Main orchestration interface | Overall system workflow                   | Coordinates query processing, manages system configuration, provides capability discovery      |
-| **IContentDiscovery** | Content discovery contract   | External content source access            | Abstracts different content sources, handles search ranking, manages source validation         |
-| **IAIStrategy**       | AI processing abstraction    | Different AI processing approaches        | Enables switching between local/cloud AI, handles content summarization and insight extraction |
-| **IPlatformAdapter**  | Platform-specific formatting | Knowledge management platform differences | Converts content to platform-native formats, handles platform-specific delivery                |
-| **ICacheManager**     | Caching abstraction          | Different caching strategies and storage  | Provides unified caching interface, manages cache policies and performance tracking            |
-| **IEventBus**         | Event communication          | Inter-component messaging                 | Enables loose coupling, handles event routing and subscription management                      |
+| Interface              | Purpose                      | Abstracts                                 | Responsibilities                                                                               |
+| ---------------------- | ---------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **IKnowledgeAgent**    | Main orchestration interface | Overall system workflow                   | Coordinates query processing, manages system configuration, provides capability discovery      |
+| **IContentDiscovery**  | Content discovery contract   | External content source access            | Abstracts different content sources, handles search ranking, manages source validation         |
+| **IAIStrategy**        | AI processing abstraction    | Different AI processing approaches        | Enables switching between local/cloud AI, handles content summarization and insight extraction |
+| **IPlatformAdapter**   | Platform-specific formatting | Knowledge management platform differences | Converts content to platform-native formats, handles platform-specific delivery                |
+| **ICacheManager**      | Caching abstraction          | Different caching strategies and storage  | Provides unified caching interface, manages cache policies and performance tracking            |
+| **IEventBus**          | Event communication          | Inter-component messaging                 | Enables loose coupling, handles event routing and subscription management                      |
+| **ITaxonomyManager**   | Taxonomy system contract     | Term classification and learning          | Manages static/learned terms, domain classification, content analysis, external validation     |
 
 ## 5.2 Level 2 - Core Knowledge Agent
 
@@ -563,5 +563,251 @@ Cross-cutting concerns are applied as aspects:
 | **Performance Monitoring** | Timing aspects             | All processing operations          |
 | **Security**               | Authorization aspects      | All data access operations         |
 | **Caching**                | Caching aspects            | Expensive operations               |
+
+## 5.10 Domain-Aware Taxonomy System
+
+### 5.10.1 Taxonomy Architecture Overview
+
+The Domain-Aware Taxonomy System represents a major advancement from static, hardcoded term lists to an intelligent, adaptive knowledge classification system that combines:
+
+- **Static Base Terms**: Reliable foundation terminology
+- **Dynamic Learning**: Adaptive term discovery from content
+- **External Validation**: Verification against authoritative sources
+
+```mermaid
+graph TB
+    subgraph "Domain-Aware Taxonomy System"
+        TM["🏗️ Taxonomy Manager"]
+        ST["📚 Static Terms"]
+        LT["🎓 Learned Terms"]
+        DM["🌐 Domain Manager"]
+        EV["✅ External Validators"]
+
+        subgraph "External Validation"
+            GH["GitHub Validator"]
+            WK["Wikipedia Validator"]
+            SO["Stack Overflow Validator"]
+            NPM["NPM Validator"]
+            CV["Composite Validator"]
+        end
+
+        subgraph "Learning Engine"
+            TC["Term Candidate Extraction"]
+            TA["Term Analysis"]
+            CL["Content Classification"]
+            ML["Machine Learning"]
+        end
+    end
+
+    TM --> ST
+    TM --> LT
+    TM --> DM
+    TM --> EV
+    EV --> GH
+    EV --> WK
+    EV --> SO
+    EV --> NPM
+    EV --> CV
+    TM --> TC
+    TC --> TA
+    TA --> CL
+    CL --> ML
+```
+
+### 5.10.2 Core Components
+
+#### Taxonomy Manager (`DomainTaxonomyManager`)
+
+**Responsibility**: Central orchestrator for all taxonomy operations
+
+- Manages static and learned term collections
+- Coordinates external validation processes
+- Provides unified API for term classification and learning
+- Maintains taxonomy metrics and performance tracking
+
+**Key Interfaces**:
+
+- `ITaxonomyManager`: Main taxonomy contract
+- `TaxonomyTerm`: Individual term representation
+- `TaxonomyDomain`: Domain classification structure
+
+#### Static Terms Foundation
+
+**Responsibility**: Provides reliable base terminology
+
+- Programming languages (JavaScript, Python, Java, etc.)
+- Frameworks and libraries (React, Django, Express, etc.)
+- Software engineering concepts (API, microservices, CI/CD, etc.)
+- High confidence scores (1.0) for established terms
+
+#### Dynamic Learning Engine
+
+**Responsibility**: Discovers and validates new terms from content
+
+**Learning Process**:
+
+1. **Term Extraction**: Tokenization and candidate identification
+2. **Context Analysis**: Content type, platform, and co-occurrence patterns
+3. **Confidence Scoring**: Multi-factor confidence calculation
+4. **External Validation**: Verification against external sources
+5. **Term Integration**: Addition to learned terms collection
+
+**Learning Factors**:
+
+- Content source credibility
+- Term frequency and context
+- Pattern-based recognition (e.g., ends with 'js')
+- Domain keyword co-occurrence
+- External validation results
+
+#### External Validation System
+
+**Responsibility**: Validates terms against authoritative external sources
+
+##### GitHub Validator
+
+- Validates programming terms against repository popularity
+- Uses star count and repository frequency for confidence
+- Specialized for programming and software engineering domains
+
+##### Wikipedia Validator
+
+- General knowledge validation through encyclopedia entries
+- Relevance scoring based on domain keyword matches
+- Broad domain coverage for conceptual validation
+
+##### Stack Overflow Validator
+
+- Programming term validation through tag popularity
+- Question count and tag usage for confidence scoring
+- Specialized for technical Q&A validation
+
+##### NPM Registry Validator
+
+- JavaScript/Node.js ecosystem validation
+- Package popularity and download metrics
+- Framework and library validation
+
+##### Composite Validator
+
+- Combines multiple validators for comprehensive validation
+- Weighted confidence calculation from multiple sources
+- Fallback and redundancy for validation reliability
+
+### 5.10.3 Domain Classification
+
+#### Supported Domains
+
+| Domain                   | Description                                          | Categories                                    |
+| ------------------------ | ---------------------------------------------------- | --------------------------------------------- |
+| **Programming**          | Languages, frameworks, and development tools         | language, framework, library, tool            |
+| **Software Engineering** | Practices, methodologies, and architectural patterns | concept, methodology, practice, tool          |
+| **Data Science**         | Analysis, modeling, and machine learning             | analysis, modeling, visualization, statistics |
+| **Web Development**      | Frontend, backend, and web technologies              | frontend, backend, fullstack, protocol        |
+
+#### Classification Process
+
+1. **Content Analysis**: Extract candidate terms from input content
+2. **Domain Scoring**: Score terms against domain keyword patterns
+3. **Confidence Calculation**: Multi-factor confidence assessment
+4. **Result Ranking**: Sort by confidence and relevance
+
+### 5.10.4 Enhanced Terms Configuration
+
+#### Migration from Static to Dynamic
+
+**Previous Approach (Deprecated)**:
+
+```typescript
+// Static hardcoded arrays
+export const TECHNICAL_TERMS = {
+  languages: ['javascript', 'python', ...],
+  frameworks: ['react', 'django', ...],
+  // ... more static lists
+};
+```
+
+**New Approach (Enhanced)**:
+
+```typescript
+// Dynamic taxonomy with learning
+const taxonomy = new DomainTaxonomyManager();
+await taxonomy.initialize();
+
+// Learn from content
+const learnedTerms = await taxonomy.learnFromContent(content, context);
+
+// Get terms for domain
+const programmingTerms = taxonomy.getTermsForDomain('programming');
+
+// Classify content
+const classifications = taxonomy.classifyContent(content);
+```
+
+#### Backwards Compatibility
+
+The enhanced system maintains backwards compatibility through:
+
+- Legacy function exports that delegate to the new system
+- Gradual migration path for existing code
+- Static term fallbacks during transition period
+
+### 5.10.5 Integration with Content Processing
+
+#### Content Relevance Scoring Integration
+
+The taxonomy system enhances content relevance scoring by:
+
+- Providing domain-specific term weights
+- Contributing to technical term detection
+- Enabling content complexity assessment
+- Supporting platform-specific relevance calculation
+
+#### Knowledge Linking Integration
+
+The taxonomy supports knowledge linking through:
+
+- Related term discovery and suggestion
+- Domain-based content clustering
+- Semantic similarity calculation
+- Context-aware link generation
+
+### 5.10.6 Performance and Scalability
+
+#### Caching Strategy
+
+- In-memory term storage for fast lookups
+- Configurable learned term limits
+- Metric-based cache eviction policies
+- Background validation processing
+
+#### External Validation Optimization
+
+- Parallel validator execution
+- Fallback mechanisms for validator failures
+- Rate limiting and API quota management
+- Response caching for repeated validations
+
+### 5.10.7 Configuration and Extensibility
+
+#### Learning Configuration
+
+```typescript
+interface TermLearningConfig {
+  minConfidence: number; // Minimum confidence threshold
+  minFrequency: number; // Minimum occurrence frequency
+  maxLearnedTerms: number; // Maximum learned terms storage
+  enableExternalValidation: boolean;
+  focusDomains?: string[]; // Domains to prioritize
+  excludeTerms?: string[]; // Terms to exclude from learning
+}
+```
+
+#### Extensibility Points
+
+- Custom domain definitions
+- Additional external validators
+- Custom term analysis algorithms
+- Configurable confidence scoring factors
 
 This building block view provides a comprehensive understanding of the system's static structure while maintaining clear separation of concerns and enabling flexibility for implementation and evolution.

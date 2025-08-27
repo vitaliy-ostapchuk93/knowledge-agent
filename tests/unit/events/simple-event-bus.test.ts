@@ -223,7 +223,11 @@ describe('SimpleEventBus', () => {
   describe('Error Handling', () => {
     it('should handle errors in callbacks gracefully', () => {
       let successCallbackCalled = false;
-
+      
+      // Suppress console errors during test
+      const originalConsoleError = console.error;
+      console.error = () => {}; // Mock console.error
+      
       eventBus.subscribe('error-handling', () => {
         throw new Error('Callback error');
       });
@@ -245,6 +249,9 @@ describe('SimpleEventBus', () => {
       }).not.toThrow();
 
       expect(successCallbackCalled).toBe(true);
+      
+      // Restore console.error
+      console.error = originalConsoleError;
     });
 
     it('should handle publishing events with no subscribers gracefully', () => {

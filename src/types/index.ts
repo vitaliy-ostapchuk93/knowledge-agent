@@ -26,3 +26,6 @@ export * from '@/types/knowledge.ts';
 
 // Event System Types
 export * from '@/types/events.ts';
+
+// Taxonomy Types
+export * from '@/types/taxonomy.ts';

@@ -18,8 +18,8 @@ import { removeStopwords, eng } from 'stopword';
 import compromise from 'compromise';
 import {
   detectTechnicalTerms,
-  getDifficultyTerms,
-  assessContentComplexity,
+  // getDifficultyTerms,
+  // assessContentComplexity,
 } from '@/utils/terms-config.ts';
 
 export class MockAIStrategy implements IProcessingStrategy {
