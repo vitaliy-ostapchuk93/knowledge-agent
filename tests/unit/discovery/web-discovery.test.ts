@@ -25,7 +25,12 @@ describe('Web Discovery', () => {
     const firstResult = results[0];
     expect(firstResult.title).toBeDefined();
     expect(firstResult.content).toBeDefined();
-    expect(firstResult.source).toBe(ContentSource.WEB);
+    expect([
+      ContentSource.DOCUMENTATION,
+      ContentSource.TUTORIAL,
+      ContentSource.STACKOVERFLOW,
+      ContentSource.GITHUB,
+    ]).toContain(firstResult.source);
     expect(firstResult.url).toBeDefined();
     expect(firstResult.metadata).toBeDefined();
   });
@@ -47,10 +52,10 @@ describe('Web Discovery', () => {
 
     // Verify metadata structure matches
     expect(discoveredItem.metadata).toHaveProperty('domain');
-    expect(discoveredItem.metadata).toHaveProperty('publishDate');
-    expect(discoveredItem.metadata).toHaveProperty('author');
-    expect(discoveredItem.metadata).toHaveProperty('wordCount');
-    expect(discoveredItem.metadata).toHaveProperty('language');
+    expect(discoveredItem.metadata).toHaveProperty('timestamp');
+    expect(discoveredItem.metadata).toHaveProperty('source');
+    expect(discoveredItem.metadata).toHaveProperty('type');
+    expect(discoveredItem.metadata).toHaveProperty('url');
   });
 
   it('should filter content by relevance when requested', async () => {

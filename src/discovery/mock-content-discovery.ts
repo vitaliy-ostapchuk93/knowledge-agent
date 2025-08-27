@@ -1,6 +1,6 @@
 /**
  * Mock Content Discovery Service - No API Keys Required
- * Simulates content discovery from various sources
+ * Simulates content discovery from various sources with NLP-powered relevance scoring
  */
 
 import {
@@ -9,14 +9,18 @@ import {
   SearchOptions,
   ContentResult,
   ContentType,
+  DiscoveredContent,
 } from '@/types/index.ts';
 import { IContentDiscovery } from '@/interfaces/index.ts';
 import { logger } from '@/utils/logger.ts';
+import { ContentRelevanceScorer } from '@/core/content-relevance-scorer.ts';
 
 export class MockContentDiscovery implements IContentDiscovery {
   private mockDatabase: ContentItem[] = [];
+  private relevanceScorer: ContentRelevanceScorer;
 
   constructor() {
+    this.relevanceScorer = new ContentRelevanceScorer();
     this.initializeMockData();
   }
 
@@ -31,8 +35,15 @@ export class MockContentDiscovery implements IContentDiscovery {
     // Simulate network delay
     await this.delay(100);
 
-    const results = this.mockDatabase
-      .filter(item => this.isRelevant(item, query))
+    // Filter with async relevance checking
+    const relevantItems = [];
+    for (const item of this.mockDatabase) {
+      if (await this.isRelevant(item, query)) {
+        relevantItems.push(item);
+      }
+    }
+
+    const results = relevantItems
       .sort((a, b) => b.relevanceScore - a.relevanceScore)
       .slice(0, options.maxResults || 5);
 
@@ -70,8 +81,16 @@ export class MockContentDiscovery implements IContentDiscovery {
     _timeframe: 'day' | 'week' | 'month' = 'week'
   ): Promise<ContentItem[]> {
     await this.delay(200);
-    return this.mockDatabase
-      .filter(item => this.isRelevant(item, topic))
+    
+    // Filter with async relevance checking
+    const relevantItems = [];
+    for (const item of this.mockDatabase) {
+      if (await this.isRelevant(item, topic)) {
+        relevantItems.push(item);
+      }
+    }
+
+    return relevantItems
       .sort((a, b) => b.relevanceScore - a.relevanceScore)
       .slice(0, 10);
   }
@@ -99,8 +118,15 @@ export class MockContentDiscovery implements IContentDiscovery {
     // Simulate network delay
     await this.delay(800);
 
-    const results = this.mockDatabase
-      .filter(item => this.isRelevant(item, query))
+    // Filter with async relevance checking
+    const relevantItems = [];
+    for (const item of this.mockDatabase) {
+      if (await this.isRelevant(item, query)) {
+        relevantItems.push(item);
+      }
+    }
+
+    const results = relevantItems
       .sort((a, b) => b.relevanceScore - a.relevanceScore)
       .slice(0, maxResults);
 
@@ -417,20 +443,38 @@ const pool = new Pool({
   }
 
   /**
-   * Check if content is relevant to query
+   * Check if content is relevant to query using NLP-powered semantic analysis
    */
-  private isRelevant(item: ContentItem, query: string): boolean {
-    const searchTerms = query.toLowerCase().split(/\s+/);
-    const searchableText = [
-      item.title,
-      item.content,
-      ...item.metadata.tags,
-      item.metadata.author || '',
-    ]
-      .join(' ')
-      .toLowerCase();
+  private async isRelevant(item: ContentItem, query: string): Promise<boolean> {
+    // Convert ContentItem to DiscoveredContent for relevance scoring
+    const discoveredContent: DiscoveredContent = {
+      id: item.id,
+      title: item.title,
+      content: item.content,
+      url: item.url,
+      source: item.source,
+      metadata: {
+        ...item.metadata,
+        // Ensure metadata is a proper Record<string, unknown>
+        author: item.metadata.author,
+        publishDate: item.metadata.publishDate,
+        tags: item.metadata.tags,
+        contentType: item.metadata.contentType,
+        wordCount: item.metadata.wordCount,
+        language: item.metadata.language,
+        difficulty: item.metadata.difficulty,
+      },
+      relevanceScore: item.relevanceScore || 0.5,
+      tags: item.metadata.tags || [],
+    };
 
-    return searchTerms.some(term => searchableText.includes(term));
+    const relevanceScore = await this.relevanceScorer.calculateRelevance(discoveredContent, query);
+
+    // Update the item's relevance score based on NLP analysis
+    item.relevanceScore = relevanceScore;
+
+    // Threshold for relevance (configurable)
+    return relevanceScore > 0.3;
   }
 
   /**

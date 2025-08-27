@@ -78,7 +78,7 @@ describe('Cross-Cutting Concerns Architecture', () => {
       for (const file of allFiles) {
         try {
           // Skip test files, demo files, entry points, setup files, and logger utility
-          if (file.includes('test') || file.endsWith('index.ts') || file.endsWith('logger.ts'))
+          if (file.includes('test') || file.includes('demo') || file.endsWith('index.ts') || file.endsWith('logger.ts'))
             continue;
 
           const content = readFileSync(file, 'utf-8'); // Check for direct console.log usage (simple pattern)

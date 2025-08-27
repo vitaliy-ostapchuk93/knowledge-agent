@@ -5,7 +5,7 @@
  * It demonstrates the MVP implementation with a comprehensive demo.
  */
 
-import { runMVPDemo } from '@/demo/demo.ts';
+import { runAllDemos } from '@/demo/demo.ts';
 import { logger } from '@/utils/logger.ts';
 
 logger.debug('🚀 Universal Knowledge Agent - MVP Implementation');
@@ -30,7 +30,7 @@ async function main() {
     logger.debug('\n' + '='.repeat(60));
 
     // Run the comprehensive MVP demo
-    await runMVPDemo();
+    await runAllDemos();
 
     logger.debug('\n🎯 System completed successfully! Exiting...');
     process.exit(0);

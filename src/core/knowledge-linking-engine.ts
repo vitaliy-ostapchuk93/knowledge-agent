@@ -1,10 +1,16 @@
 /**
  * Knowledge Linking Engine
  * Automatically detects relationships between content and creates bidirectional links
+ * Enhanced with professional NLP libraries for superior semantic understanding
  */
 
 import { DiscoveredContent } from '@/types/index.ts';
 import { logger } from '@/utils/logger.ts';
+import { WordTokenizer, SentimentAnalyzer, PorterStemmer as Stemmer, TfIdf } from 'natural';
+import { compareTwoStrings } from 'string-similarity';
+import { removeStopwords, eng } from 'stopword';
+import compromise from 'compromise';
+import { stemmer } from 'stemmer';
 
 export interface KnowledgeLink {
   sourceId: string;
@@ -34,6 +40,18 @@ export class KnowledgeLinkingEngine {
     links: [],
     clusters: [],
   };
+
+  // Enhanced NLP components for superior semantic understanding
+  private readonly tokenizer: WordTokenizer;
+  private readonly tfidf: TfIdf;
+  private readonly sentimentAnalyzer: SentimentAnalyzer;
+
+  constructor() {
+    this.tokenizer = new WordTokenizer();
+    this.tfidf = new TfIdf();
+    this.sentimentAnalyzer = new SentimentAnalyzer('English', Stemmer, 'afinn');
+    logger.debug('🔗 Knowledge Linking Engine initialized with enhanced NLP capabilities');
+  }
 
   /**
    * Add content to the knowledge graph and detect links
@@ -252,9 +270,249 @@ export class KnowledgeLinkingEngine {
   }
 
   /**
-   * Calculate content similarity using keyword analysis
+   * Calculate content similarity using enhanced NLP analysis
    */
   private calculateContentSimilarity(
+    content1: string,
+    content2: string
+  ): {
+    score: number;
+    commonConcepts: string[];
+  } {
+    try {
+      // Enhanced semantic similarity using string-similarity
+      const semanticScore = compareTwoStrings(content1.toLowerCase(), content2.toLowerCase());
+
+      // Extract keywords using enhanced NLP
+      const keywords1 = this.extractKeywordsWithNLP(content1);
+      const keywords2 = this.extractKeywordsWithNLP(content2);
+
+      // Calculate keyword overlap
+      const keywordOverlap = this.calculateTagOverlap(keywords1, keywords2);
+
+      // Use TF-IDF for document similarity
+      const tfidfScore = this.calculateTfIdfSimilarity(content1, content2);
+
+      // Extract entities and concepts using compromise.js
+      const concepts1 = this.extractConceptsWithNLP(content1);
+      const concepts2 = this.extractConceptsWithNLP(content2);
+      const conceptOverlap = this.calculateTagOverlap(concepts1, concepts2);
+
+      // Combine scores with weights
+      const combinedScore =
+        semanticScore * 0.3 +
+        keywordOverlap.score * 0.3 +
+        tfidfScore * 0.2 +
+        conceptOverlap.score * 0.2;
+
+      // Combine common elements
+      const allCommonConcepts = [...keywordOverlap.commonTags, ...conceptOverlap.commonTags].filter(
+        (item, index, array) => array.indexOf(item) === index
+      );
+
+      return {
+        score: Math.min(1, combinedScore),
+        commonConcepts: allCommonConcepts.slice(0, 5), // Limit for readability
+      };
+    } catch (error) {
+      logger.debug('Enhanced content similarity calculation failed, using fallback:', error);
+      return this.calculateBasicContentSimilarity(content1, content2);
+    }
+  }
+
+  /**
+   * Enhanced keyword extraction using NLP libraries
+   */
+  private extractKeywordsWithNLP(content: string): string[] {
+    try {
+      // Use natural tokenizer and stopword removal
+      const tokens = this.tokenizer.tokenize(content.toLowerCase()) || [];
+      const filteredTokens = removeStopwords(tokens, eng);
+
+      // Count word frequencies
+      const frequency: { [key: string]: number } = {};
+      filteredTokens.forEach(word => {
+        if (word.length > 3) {
+          frequency[word] = (frequency[word] || 0) + 1;
+        }
+      });
+
+      // Use compromise.js for better concept extraction
+      const doc = compromise(content);
+      const nouns = doc.nouns().out('array');
+      const topics = doc.topics().out('array');
+
+      // Combine frequency-based and NLP-extracted terms
+      const nlpTerms = [...nouns, ...topics]
+        .map(term => term.toLowerCase())
+        .filter(term => term.length > 2);
+
+      // Technical terms that should be prioritized
+      const techTerms = this.getTechnicalTerms();
+
+      // Score and rank all terms
+      const allTerms = [...nlpTerms, ...Object.keys(frequency)];
+      const scoredTerms = allTerms.map(term => ({
+        term,
+        score:
+          (frequency[term] || 0) +
+          (techTerms.includes(term) ? 2 : 0) +
+          (nlpTerms.includes(term) ? 1 : 0),
+      }));
+
+      return [
+        ...new Set(
+          scoredTerms
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10)
+            .map(item => item.term)
+        ),
+      ].filter(term => term.length > 2);
+    } catch (error) {
+      logger.debug('Enhanced keyword extraction failed, using basic method:', error);
+      return this.extractKeywords(content);
+    }
+  }
+
+  /**
+   * Extract concepts and entities using compromise.js
+   */
+  private extractConceptsWithNLP(content: string): string[] {
+    try {
+      const doc = compromise(content);
+
+      // Extract different types of concepts
+      const people = doc.people().out('array');
+      const places = doc.places().out('array');
+      const organizations = doc.organizations().out('array');
+      const topics = doc.topics().out('array');
+      const nouns = doc.nouns().out('array');
+
+      // Combine and clean concepts
+      const allConcepts = [...people, ...places, ...organizations, ...topics, ...nouns];
+
+      const cleanConcepts = allConcepts
+        .filter(concept => concept && concept.length > 2)
+        .filter(concept => concept.length < 50)
+        .map(concept => concept.toLowerCase().trim())
+        .filter(concept => !/^\d+$/.test(concept))
+        .filter(concept => !concept.includes('http'));
+
+      return [...new Set(cleanConcepts)].slice(0, 8);
+    } catch (error) {
+      logger.debug('Concept extraction failed:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Calculate TF-IDF based similarity between two documents
+   */
+  private calculateTfIdfSimilarity(content1: string, content2: string): number {
+    try {
+      // Clear previous documents
+      this.tfidf.documents.length = 0;
+
+      // Add documents to TF-IDF corpus
+      this.tfidf.addDocument(content1);
+      this.tfidf.addDocument(content2);
+
+      // Extract meaningful terms from both documents
+      const terms1 = this.extractKeywordsWithNLP(content1).slice(0, 10);
+      const terms2 = this.extractKeywordsWithNLP(content2).slice(0, 10);
+      const allTerms = [...new Set([...terms1, ...terms2])];
+
+      if (allTerms.length === 0) return 0;
+
+      // Calculate TF-IDF vectors
+      const vector1: number[] = [];
+      const vector2: number[] = [];
+
+      allTerms.forEach(term => {
+        vector1.push(this.tfidf.tfidf(term, 0));
+        vector2.push(this.tfidf.tfidf(term, 1));
+      });
+
+      // Calculate cosine similarity
+      const dotProduct = vector1.reduce((sum, val, i) => sum + val * vector2[i], 0);
+      const magnitude1 = Math.sqrt(vector1.reduce((sum, val) => sum + val * val, 0));
+      const magnitude2 = Math.sqrt(vector2.reduce((sum, val) => sum + val * val, 0));
+
+      if (magnitude1 === 0 || magnitude2 === 0) return 0;
+
+      return dotProduct / (magnitude1 * magnitude2);
+    } catch (error) {
+      logger.debug('TF-IDF similarity calculation failed:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Get list of technical terms for prioritization
+   */
+  private getTechnicalTerms(): string[] {
+    return [
+      // Programming languages
+      'javascript',
+      'typescript',
+      'python',
+      'java',
+      'react',
+      'vue',
+      'angular',
+      'nodejs',
+      'express',
+      'fastify',
+      'nestjs',
+      'graphql',
+      'rest',
+      'api',
+
+      // Development concepts
+      'component',
+      'function',
+      'class',
+      'interface',
+      'pattern',
+      'design',
+      'algorithm',
+      'performance',
+      'security',
+      'testing',
+      'deployment',
+      'framework',
+      'library',
+      'service',
+      'authentication',
+      'authorization',
+      'middleware',
+      'routing',
+      'optimization',
+      'caching',
+      'database',
+
+      // Architecture terms
+      'microservices',
+      'monolith',
+      'serverless',
+      'container',
+      'docker',
+      'kubernetes',
+      'devops',
+      'cicd',
+      'architecture',
+      'scalability',
+      'distributed',
+      'concurrent',
+      'asynchronous',
+      'synchronous',
+    ];
+  }
+
+  /**
+   * Basic content similarity fallback
+   */
+  private calculateBasicContentSimilarity(
     content1: string,
     content2: string
   ): {
@@ -375,12 +633,39 @@ export class KnowledgeLinkingEngine {
   }
 
   /**
-   * Check if content mentions a specific technology/concept
+   * Enhanced check if content mentions a specific technology/concept using semantic matching
    */
   private contentMentions(content: DiscoveredContent, term: string): boolean {
     const searchText =
       `${content.title} ${content.content} ${content.tags.join(' ')}`.toLowerCase();
-    return searchText.includes(term.toLowerCase());
+
+    // Basic exact match
+    if (searchText.includes(term.toLowerCase())) {
+      return true;
+    }
+
+    try {
+      // Enhanced semantic checking
+      // Check stemmed versions
+      const stemmedTerm = stemmer(term.toLowerCase());
+      const tokens = this.tokenizer.tokenize(searchText) || [];
+      const stemmedTokens = tokens.map(token => stemmer(token));
+
+      if (stemmedTokens.includes(stemmedTerm)) {
+        return true;
+      }
+
+      // Check semantic similarity with key concepts
+      const concepts = this.extractConceptsWithNLP(searchText);
+      const semanticMatches = concepts.filter(
+        concept => compareTwoStrings(concept, term.toLowerCase()) > 0.7
+      );
+
+      return semanticMatches.length > 0;
+    } catch (error) {
+      logger.debug('Semantic content mention check failed, using basic match:', error);
+      return searchText.includes(term.toLowerCase());
+    }
   }
 
   /**

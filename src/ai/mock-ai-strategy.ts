@@ -13,9 +13,26 @@ import {
   RelatedLink,
 } from '@/types/index.ts';
 import { logger } from '@/utils/logger.ts';
+import { WordTokenizer, SentimentAnalyzer, PorterStemmer as Stemmer } from 'natural';
+import { removeStopwords, eng } from 'stopword';
+import compromise from 'compromise';
+import {
+  detectTechnicalTerms,
+  getDifficultyTerms,
+  assessContentComplexity,
+} from '@/utils/terms-config.ts';
 
 export class MockAIStrategy implements IProcessingStrategy {
   readonly strategyType = ProcessingStrategy.LOCAL;
+
+  // NLP components for enhanced text processing
+  private readonly tokenizer: WordTokenizer;
+  private readonly sentimentAnalyzer: SentimentAnalyzer;
+
+  constructor() {
+    this.tokenizer = new WordTokenizer();
+    this.sentimentAnalyzer = new SentimentAnalyzer('English', Stemmer, 'afinn');
+  }
 
   /**
    * Summarize content using local processing
@@ -53,11 +70,40 @@ export class MockAIStrategy implements IProcessingStrategy {
   }
 
   /**
-   * Analyze content characteristics
+   * Analyze content characteristics using enhanced NLP
    */
   async analyze(content: string): Promise<Analysis> {
     await this.delay(200);
 
+    try {
+      // Use natural sentiment analysis
+      const tokens = this.tokenizer.tokenize(content) || [];
+      const sentimentScore = this.sentimentAnalyzer.getSentiment(tokens);
+
+      // Convert numeric sentiment to categorical
+      let sentiment: 'positive' | 'neutral' | 'negative' = 'neutral';
+      if (sentimentScore > 0.1) sentiment = 'positive';
+      else if (sentimentScore < -0.1) sentiment = 'negative';
+
+      const analysis: Analysis = {
+        sentiment,
+        complexity: this.assessComplexity(content),
+        topics: this.extractTags(content).slice(0, 5),
+        keyEntities: this.extractEntities(content),
+        readingLevel: this.calculateReadingLevel(content),
+      };
+
+      return analysis;
+    } catch (error) {
+      logger.debug('Error in NLP analysis, falling back to simple analysis:', error);
+      return this.analyzeSimple(content);
+    }
+  }
+
+  /**
+   * Simple fallback analysis
+   */
+  private analyzeSimple(content: string): Analysis {
     const words = content.toLowerCase().split(/\s+/);
     const positiveWords = ['good', 'great', 'excellent', 'best', 'effective', 'useful'];
     const negativeWords = ['bad', 'poor', 'difficult', 'problem', 'issue', 'error'];
@@ -69,15 +115,13 @@ export class MockAIStrategy implements IProcessingStrategy {
     if (positiveCount > negativeCount + 1) sentiment = 'positive';
     else if (negativeCount > positiveCount + 1) sentiment = 'negative';
 
-    const analysis: Analysis = {
+    return {
       sentiment,
       complexity: this.assessComplexity(content),
       topics: this.extractTags(content).slice(0, 5),
       keyEntities: this.extractEntities(content),
       readingLevel: this.calculateReadingLevel(content),
     };
-
-    return analysis;
   }
 
   /**
@@ -185,9 +229,67 @@ export class MockAIStrategy implements IProcessingStrategy {
   }
 
   /**
-   * Extract tags from content
+   * Extract tags from content using enhanced NLP
    */
   private extractTags(content: string): string[] {
+    try {
+      // Use compromise.js for better entity and concept extraction
+      const doc = compromise(content);
+
+      // Extract various types of meaningful terms
+      const nouns = doc.nouns().out('array');
+      const topics = doc.topics().out('array');
+      const technologies = doc.match('#Technology').out('array');
+
+      // Use natural tokenizer and stopword removal
+      const tokens = this.tokenizer.tokenize(content.toLowerCase()) || [];
+      const filteredTokens = removeStopwords(tokens, eng);
+
+      // Count word frequencies
+      const frequency: { [key: string]: number } = {};
+      filteredTokens.forEach(word => {
+        if (word.length > 3) {
+          frequency[word] = (frequency[word] || 0) + 1;
+        }
+      });
+
+      // Combine NLP-extracted terms with frequency analysis
+      const nlpTerms = [...nouns, ...topics, ...technologies]
+        .map(term => term.toLowerCase())
+        .filter(term => term.length > 2);
+
+      // Technical terms that should be prioritized
+      const techTerms = detectTechnicalTerms(content, filteredTokens);
+
+      // Combine and score all terms
+      const allTerms = [...nlpTerms, ...Object.keys(frequency)];
+      const scoredTerms = allTerms.map(term => ({
+        term,
+        score:
+          (frequency[term] || 0) +
+          (techTerms.includes(term) ? 2 : 0) +
+          (nlpTerms.includes(term) ? 1 : 0),
+      }));
+
+      // Return top scored unique terms
+      return [
+        ...new Set(
+          scoredTerms
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10)
+            .map(item => item.term)
+        ),
+      ].filter(term => term.length > 2);
+    } catch (error) {
+      logger.debug('Error in NLP tag extraction, falling back to simple method:', error);
+      return this.extractTagsSimple(content);
+    }
+  }
+
+  /**
+   * Simple fallback tag extraction
+   */
+  private extractTagsSimple(content: string): string[] {
     const words = content
       .toLowerCase()
       .replace(/[^\w\s]/g, ' ')
@@ -199,34 +301,11 @@ export class MockAIStrategy implements IProcessingStrategy {
       frequency[word] = (frequency[word] || 0) + 1;
     });
 
-    // Common technical terms that should be prioritized
-    const techTerms = [
-      'react',
-      'typescript',
-      'javascript',
-      'node',
-      'api',
-      'database',
-      'component',
-      'function',
-      'class',
-      'interface',
-      'pattern',
-      'design',
-      'algorithm',
-      'performance',
-      'security',
-      'testing',
-      'deployment',
-    ];
-
-    const tags = Object.entries(frequency)
-      .filter(([word, count]) => count > 1 || techTerms.includes(word))
+    return Object.entries(frequency)
+      .filter(([_word, count]) => count > 1)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 10)
       .map(([word]) => word);
-
-    return tags;
   }
 
   /**
@@ -378,9 +457,41 @@ export class MockAIStrategy implements IProcessingStrategy {
   }
 
   /**
-   * Extract entities (simplified)
+   * Extract entities using enhanced NLP
    */
   private extractEntities(content: string): string[] {
+    try {
+      // Use compromise.js for sophisticated entity extraction
+      const doc = compromise(content);
+
+      // Extract different types of entities
+      const people = doc.people().out('array');
+      const places = doc.places().out('array');
+      const organizations = doc.organizations().out('array');
+      const topics = doc.topics().out('array');
+
+      // Combine all entities
+      const allEntities = [...people, ...places, ...organizations, ...topics];
+
+      // Filter and clean entities
+      const cleanEntities = allEntities
+        .filter(entity => entity && entity.length > 2)
+        .filter(entity => entity.length < 50) // Remove very long matches
+        .map(entity => entity.trim())
+        .filter(entity => !/^\d+$/.test(entity)) // Remove pure numbers
+        .filter(entity => !entity.includes('http')); // Remove URLs
+      // Remove duplicates and return top entities
+      return [...new Set(cleanEntities)].slice(0, 8);
+    } catch (error) {
+      logger.debug('Error in NLP entity extraction, falling back to simple method:', error);
+      return this.extractEntitiesSimple(content);
+    }
+  }
+
+  /**
+   * Simple fallback entity extraction
+   */
+  private extractEntitiesSimple(content: string): string[] {
     // Look for capitalized words that might be entities
     const capitalizedWords = content.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g) || [];
 
