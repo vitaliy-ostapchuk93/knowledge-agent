@@ -68,7 +68,7 @@ export class ContentRelevanceScorer {
   constructor() {
     this.tokenizer = new WordTokenizer();
     this.tfidf = new TfIdf();
-        this.sentimentAnalyzer = new SentimentAnalyzer('English', Stemmer, 'afinn');
+    this.sentimentAnalyzer = new SentimentAnalyzer('English', Stemmer, 'afinn');
   }
 
   /**

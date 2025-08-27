@@ -81,10 +81,7 @@ export class RedditDiscovery {
   /**
    * Search for Reddit posts (MVP implementation with realistic mock data)
    */
-  private async searchPosts(
-    query: string,
-    options: RedditDiscoveryOptions
-  ): Promise<RedditPost[]> {
+  private async searchPosts(query: string, options: RedditDiscoveryOptions): Promise<RedditPost[]> {
     // Simulate realistic Reddit search results
     const mockPosts: RedditPost[] = [
       {
@@ -270,7 +267,9 @@ Happy to answer questions about our evaluation process!`,
     // Apply filters
     if (options.subreddits && options.subreddits.length > 0) {
       results = results.filter(post =>
-        options.subreddits!.some((sub: string) => post.subreddit.toLowerCase() === sub.toLowerCase())
+        options.subreddits!.some(
+          (sub: string) => post.subreddit.toLowerCase() === sub.toLowerCase()
+        )
       );
     }
 

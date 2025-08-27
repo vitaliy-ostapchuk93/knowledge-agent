@@ -4,7 +4,11 @@
  */
 
 import type { TaxonomyTerm, TaxonomyDomain } from '@/types/taxonomy.ts';
-import type { LearningContext, ExternalValidator, ValidationResult } from '@/interfaces/taxonomy-learning.ts';
+import type {
+  LearningContext,
+  ExternalValidator,
+  ValidationResult,
+} from '@/interfaces/taxonomy-learning.ts';
 import type { TermLearningConfig, TaxonomyMetrics } from '@/interfaces/taxonomy-config.ts';
 
 export interface ITaxonomyManager {

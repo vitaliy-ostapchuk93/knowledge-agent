@@ -4,22 +4,14 @@
  */
 
 import { logger } from '@/utils/logger.ts';
-import type { 
-  ITaxonomyManager,
-} from '@/interfaces/taxonomy-manager.ts';
-import type {
-  TaxonomyTerm,
-  TaxonomyDomain,
-} from '@/types/taxonomy.ts';
+import type { ITaxonomyManager } from '@/interfaces/taxonomy-manager.ts';
+import type { TaxonomyTerm, TaxonomyDomain } from '@/types/taxonomy.ts';
 import type {
   LearningContext,
   ExternalValidator,
   ValidationResult,
 } from '@/interfaces/taxonomy-learning.ts';
-import type {
-  TermLearningConfig,
-  TaxonomyMetrics,
-} from '@/interfaces/taxonomy-config.ts';
+import type { TermLearningConfig, TaxonomyMetrics } from '@/interfaces/taxonomy-config.ts';
 
 /**
  * Domain-Aware Taxonomy Manager
@@ -242,7 +234,7 @@ export class DomainTaxonomyManager implements ITaxonomyManager {
    * Import taxonomy data
    */
   async importTaxonomy(data: Record<string, TaxonomyTerm[]>): Promise<void> {
-    for (const [/* domain */, terms] of Object.entries(data)) {
+    for (const [, /* domain */ terms] of Object.entries(data)) {
       for (const term of terms) {
         await this.addTerm(term);
       }

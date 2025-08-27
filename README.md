@@ -2,11 +2,18 @@
 
 > An intelligent, privacy-first platform for automated knowledge discovery and synthesis
 
-[![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent)
-[![Architecture](https://img.shields.io/badge/Architecture-Compliant-blue.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
-[![Bun](https://img.shields.io/badge/Bun-1.0+-orange.svg)](https://bun.sh/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/blob/main/LICENSE)
+[![CI/CD Pipeline](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/ci.yml)
+[![Code Quality](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/quality.yml/badge.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/quality.yml)
+[![Security](https://img.shields.io/badge/Security-A+-green.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent)
+[![Release Build](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/release.yml/badge.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/release.yml)
+
+[![Version](https://img.shields.io/github/package-json/v/vitaliy-ostapchuk93/knowledge-agent?color=blue)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/releases)
+[![Last Commit](https://img.shields.io/github/last-commit/vitaliy-ostapchuk93/knowledge-agent)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/commits/main)
+[![GitHub Stars](https://img.shields.io/github/stars/vitaliy-ostapchuk93/knowledge-agent?style=social)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/stargazers)
+[![GitHub Issues](https://img.shields.io/github/issues/vitaliy-ostapchuk93/knowledge-agent)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/issues)
+[![Dependencies](https://img.shields.io/badge/Dependencies-Up%20to%20Date-brightgreen.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent)
+
+[![❤️ Ukraine](https://img.shields.io/badge/%E2%9D%A4%EF%B8%8F%20-%20Ukraine-FFD500?labelColor=005BBB)](https://stand-with-ukraine.pp.ua/)
 
 [**📥 Download Latest Release**](https://github.com/vitaliy-ostapchuk93/knowledge-agent/releases/latest) | [📖 Documentation](docs/) | [💬 Discussions](https://github.com/vitaliy-ostapchuk93/knowledge-agent/discussions)
 
@@ -135,7 +142,7 @@ export CACHE_TTL="3600"
 The Universal Knowledge Agent uses a clean, modular design that's easy to extend and maintain:
 
 - **Intelligent Discovery** - Automatically finds relevant content from multiple sources
-- **AI Processing** - Summarizes and extracts insights using configurable AI strategies  
+- **AI Processing** - Summarizes and extracts insights using configurable AI strategies
 - **Smart Integration** - Links new content with your existing knowledge base
 - **Platform Adapters** - Works seamlessly with your preferred tools (Markdown, Logseq, Obsidian, Notion)
 - **Domain-Aware Taxonomy** - Learns and classifies technical terms intelligently
@@ -182,6 +189,60 @@ bun test --coverage
 - **Integration Tests** - Component interaction testing
 - **Architecture Tests** - SOLID principles and design pattern compliance
 - **E2E Tests** - End-to-end workflow validation
+
+## 🚀 CI/CD & Automation
+
+The project includes comprehensive GitHub Actions workflows for automated building, testing, and quality assurance:
+
+### Automated Workflows
+
+- **🔄 CI/CD Pipeline** (`.github/workflows/ci.yml`)
+  - Multi-version Bun testing (1.0.0, latest)
+  - TypeScript compilation and linting
+  - Full test suite with coverage reporting
+  - Build verification and artifact generation
+  - Automated architecture compliance checks
+
+- **🔍 Code Quality Checks** (`.github/workflows/quality.yml`)
+  - Static analysis with ESLint and TypeScript
+  - Security vulnerability scanning
+  - Performance benchmarks and memory usage tests
+  - Documentation and API surface validation
+  - Weekly scheduled quality audits
+
+- **📦 Dependency Management** (`.github/workflows/dependency-updates.yml`)
+  - Automated dependency updates (weekly)
+  - Security audit monitoring
+  - Pull request creation for updates
+  - Compatibility testing after updates
+
+- **✅ PR Validation** (`.github/workflows/pr-validation.yml`)
+  - Conventional commit title validation
+  - Change impact analysis and automated comments
+  - Merge conflict detection
+  - PR size and complexity warnings
+
+- **🏷️ Release Automation** (`.github/workflows/release.yml`)
+  - Automated release builds on version tags
+  - Release asset generation and publishing
+  - GitHub release creation with changelogs
+
+### Quality Gates
+
+All pull requests must pass:
+
+- ✅ TypeScript compilation with strict settings
+- ✅ All 261+ automated tests
+- ✅ Architecture compliance validation
+- ✅ Code formatting and linting checks
+- ✅ Security vulnerability scans
+
+### Monitoring & Metrics
+
+- 📊 **Test Coverage**: Automated coverage reporting with Codecov
+- 🏗️ **Architecture Validation**: Dependency rules and design pattern compliance
+- 🔒 **Security**: Regular dependency audits and vulnerability scanning
+- ⚡ **Performance**: Benchmark tracking and memory usage monitoring
 
 ## ✨ Features
 

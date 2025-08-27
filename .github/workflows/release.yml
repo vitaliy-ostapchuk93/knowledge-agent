@@ -1,0 +1,109 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+  release:
+    types: [published]
+
+jobs:
+  # Build and Test for Release
+  release-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: TypeScript type checking
+        run: bunx tsc --noEmit --skipLibCheck
+
+      - name: Run all tests
+        run: bun test
+
+      - name: Build for production
+        run: bun run build
+
+      - name: Create release archive
+        run: |
+          mkdir -p release
+          cp -r dist/ release/
+          cp package.json release/
+          cp README.md release/
+          cp LICENSE release/
+          tar -czf knowledge-agent-${{ github.ref_name }}.tar.gz -C release .
+
+      - name: Upload release assets
+        uses: actions/upload-artifact@v3
+        with:
+          name: knowledge-agent-${{ github.ref_name }}
+          path: knowledge-agent-${{ github.ref_name }}.tar.gz
+
+  # Create GitHub Release
+  create-release:
+    runs-on: ubuntu-latest
+    needs: release-build
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: knowledge-agent-${{ github.ref_name }}
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Knowledge Agent ${{ github.ref_name }}
+          body: |
+            ## Changes in this Release
+
+            - Universal Knowledge Agent implementation
+            - Clean architecture with TypeScript
+            - Comprehensive test coverage
+            - Multi-platform content discovery
+            - AI-powered knowledge processing
+
+            ## Installation
+
+            ```bash
+            # Download and extract
+            tar -xzf knowledge-agent-${{ github.ref_name }}.tar.gz
+            cd knowledge-agent
+
+            # Install dependencies
+            bun install
+
+            # Run demo
+            bun run demo
+            ```
+
+            See [README.md](README.md) for full documentation.
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./knowledge-agent-${{ github.ref_name }}.tar.gz
+          asset_name: knowledge-agent-${{ github.ref_name }}.tar.gz
+          asset_content_type: application/gzip

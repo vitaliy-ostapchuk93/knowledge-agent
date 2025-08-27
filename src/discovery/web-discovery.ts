@@ -13,10 +13,7 @@ export interface WebDiscoveryOptions {
 }
 
 export class WebDiscovery {
-  async discover(
-    query: string,
-    options: WebDiscoveryOptions = {}
-  ): Promise<DiscoveredContent[]> {
+  async discover(query: string, options: WebDiscoveryOptions = {}): Promise<DiscoveredContent[]> {
     if (!query.trim()) {
       return [];
     }

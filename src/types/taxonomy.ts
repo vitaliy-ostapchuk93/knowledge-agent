@@ -10,10 +10,22 @@ export type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced' | 'expert
 export type TermSource = 'static' | 'learned' | 'external' | 'validated';
 
 /** Content types for learning context */
-export type TaxonomyContentType = 'article' | 'documentation' | 'code' | 'discussion' | 'tutorial' | 'reference';
+export type TaxonomyContentType =
+  | 'article'
+  | 'documentation'
+  | 'code'
+  | 'discussion'
+  | 'tutorial'
+  | 'reference';
 
 /** Platform types for content sources */
-export type TaxonomyPlatformType = 'reddit' | 'youtube' | 'github' | 'web' | 'stackoverflow' | 'medium';
+export type TaxonomyPlatformType =
+  | 'reddit'
+  | 'youtube'
+  | 'github'
+  | 'web'
+  | 'stackoverflow'
+  | 'medium';
 
 /** User feedback types */
 export type UserFeedback = 'positive' | 'negative' | 'neutral';

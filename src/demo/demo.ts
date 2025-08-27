@@ -102,7 +102,7 @@ if (import.meta.main) {
         logger.debug('Demo completed successfully');
         process.exit(0);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error('Demo failed:', error);
         process.exit(1);
       });
@@ -113,7 +113,7 @@ if (import.meta.main) {
         logger.debug('All demos completed successfully');
         process.exit(0);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error('Demos failed:', error);
         process.exit(1);
       });

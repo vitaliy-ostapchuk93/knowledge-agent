@@ -81,7 +81,7 @@ export class MockContentDiscovery implements IContentDiscovery {
     _timeframe: 'day' | 'week' | 'month' = 'week'
   ): Promise<ContentItem[]> {
     await this.delay(200);
-    
+
     // Filter with async relevance checking
     const relevantItems = [];
     for (const item of this.mockDatabase) {
@@ -90,9 +90,7 @@ export class MockContentDiscovery implements IContentDiscovery {
       }
     }
 
-    return relevantItems
-      .sort((a, b) => b.relevanceScore - a.relevanceScore)
-      .slice(0, 10);
+    return relevantItems.sort((a, b) => b.relevanceScore - a.relevanceScore).slice(0, 10);
   }
 
   /**

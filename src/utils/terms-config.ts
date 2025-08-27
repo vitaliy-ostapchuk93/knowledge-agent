@@ -508,7 +508,8 @@ export function getAllTechnicalTerms(): string[] {
   // Add learned terms if taxonomy system is available
   if (taxonomyManager) {
     try {
-      const learnedTerms = taxonomyManager.getTermsForDomain('programming')
+      const learnedTerms = taxonomyManager
+        .getTermsForDomain('programming')
         .concat(taxonomyManager.getTermsForDomain('data-science'))
         .map((term: any) => term.value);
       return [...new Set([...staticTerms, ...learnedTerms])];
@@ -566,16 +567,17 @@ export function detectTechnicalTerms(content: string, tokens?: string[]): string
       const techDomains = classification
         .filter(c => c.domain === 'programming' || c.domain === 'data-science')
         .filter(c => c.confidence > 0.5);
-      
+
       if (techDomains.length > 0) {
         // Get terms from technical domains
         const technicalTerms: string[] = [];
         techDomains.forEach(domain => {
-          const domainTerms = taxonomyManager!.getTermsForDomain(domain.domain)
+          const domainTerms = taxonomyManager!
+            .getTermsForDomain(domain.domain)
             .map((term: any) => term.value);
           technicalTerms.push(...domainTerms);
         });
-        
+
         if (technicalTerms.length > 0) {
           return [...new Set(technicalTerms)];
         }
@@ -618,8 +620,9 @@ export function assessContentComplexity(content: string): 'low' | 'medium' | 'hi
   if (taxonomyManager) {
     try {
       const classification = taxonomyManager.classifyContent(content);
-      const avgConfidence = classification.reduce((sum, c) => sum + c.confidence, 0) / classification.length;
-      
+      const avgConfidence =
+        classification.reduce((sum, c) => sum + c.confidence, 0) / classification.length;
+
       // Higher confidence in technical domains indicates higher complexity
       if (avgConfidence > 0.8) return 'high';
       if (avgConfidence > 0.5) return 'medium';
