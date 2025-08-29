@@ -150,7 +150,7 @@ jobs:
         if: steps.audit.outputs.vulnerabilities == 'true'
         uses: actions/github-script@v6
         with:
-          token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GH_PAT }}
           script: |
             const fs = require('fs');
             const auditResults = fs.readFileSync('audit-results.txt', 'utf8');
