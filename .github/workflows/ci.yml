@@ -132,7 +132,12 @@ jobs:
           fi
 
       - name: Run E2E tests
-        run: bun test tests/e2e/ --timeout 60000
+        run: |
+          if ls tests/e2e/*.test.ts 1> /dev/null 2>&1; then
+            bun test tests/e2e/ --timeout 60000
+          else
+            echo "No E2E tests found, skipping."
+          fi
 
       - name: Test demo scenarios
         run: bun run demo
