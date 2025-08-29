@@ -25,7 +25,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_PAT }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -89,7 +89,7 @@ jobs:
       - name: Create Pull Request
         if: steps.outdated.outputs.outdated == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           echo "Creating dependency update branch..."
           BRANCH=dependency-updates/${{ github.run_number }}
