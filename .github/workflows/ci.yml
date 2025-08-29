@@ -124,7 +124,12 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Run integration tests
-        run: bun test tests/integration/ --timeout 30000
+        run: |
+          if ls tests/integration/*.test.ts 1> /dev/null 2>&1; then
+            bun test tests/integration/ --timeout 30000
+          else
+            echo "No integration tests found, skipping."
+          fi
 
       - name: Run E2E tests
         run: bun test tests/e2e/ --timeout 60000
