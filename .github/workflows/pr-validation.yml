@@ -22,8 +22,8 @@ jobs:
       - name: PR title validation
         run: |
           PR_TITLE="${{ github.event.pull_request.title }}"
-          # Check if title follows conventional commit format
-          if [[ ! "$PR_TITLE" =~ ^(feat|fix|docs|style|refactor|test|chore|ci|perf|build)(\(.+\))?: .+ ]]; then
+          # Check if title follows conventional commit format (POSIX compliant)
+          if ! echo "$PR_TITLE" | grep -Eq '^(feat|fix|docs|style|refactor|test|chore|ci|perf|build)(\(.+\))?: .+'; then
             echo "\u274c PR title does not follow conventional commit format"
             echo "Expected format: type(scope): description"
             echo "Examples: feat: add new feature, fix(core): resolve bug, docs: update README"
