@@ -1,19 +1,19 @@
 # Universal Knowledge Agent
 
-> An intelligent, privacy-first platform for automated knowledge discovery and synthesis
+<br>
+<a href="https://vshymanskyy.github.io/StandWithUkraine">
+ <img src="https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg">
+</a>
+<br>
+<br>
+<br>
 
-[![CI/CD Pipeline](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/ci.yml)
-[![Code Quality](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/quality.yml/badge.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/quality.yml)
-[![Security](https://img.shields.io/badge/Security-A+-green.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent)
-[![Release Build](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/release.yml/badge.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/release.yml)
+<!-- Workflow & Quality Badges -->
 
-[![Version](https://img.shields.io/github/package-json/v/vitaliy-ostapchuk93/knowledge-agent?color=blue)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/releases)
-[![Last Commit](https://img.shields.io/github/last-commit/vitaliy-ostapchuk93/knowledge-agent)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/commits/main)
-[![GitHub Stars](https://img.shields.io/github/stars/vitaliy-ostapchuk93/knowledge-agent?style=social)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/stargazers)
-[![GitHub Issues](https://img.shields.io/github/issues/vitaliy-ostapchuk93/knowledge-agent)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/issues)
-[![Dependencies](https://img.shields.io/badge/Dependencies-Up%20to%20Date-brightgreen.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent)
-
-[![❤️ Ukraine](https://img.shields.io/badge/%E2%9D%A4%EF%B8%8F%20-%20Ukraine-FFD500?labelColor=005BBB)](https://stand-with-ukraine.pp.ua/)
+[![CI/CD Pipeline](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/ci.yml)
+[![Quality](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/quality.yml)
+[![Security](https://img.shields.io/badge/Security-A%2B-green.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent)
+[![Dependencies](https://img.shields.io/librariesio/release/npm/knowledge-agent)](https://libraries.io/npm/knowledge-agent)
 
 [**📥 Download Latest Release**](https://github.com/vitaliy-ostapchuk93/knowledge-agent/releases/latest) | [📖 Documentation](docs/) | [💬 Discussions](https://github.com/vitaliy-ostapchuk93/knowledge-agent/discussions)
 
