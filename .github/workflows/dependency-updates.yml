@@ -85,7 +85,7 @@ jobs:
         if: steps.outdated.outputs.outdated == 'true'
         uses: peter-evans/create-pull-request@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_PAT }}
           commit-message: |
             chore: update dependencies (${{ github.event.inputs.update_type || 'minor' }})
 
