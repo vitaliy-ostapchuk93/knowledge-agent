@@ -155,15 +155,19 @@ jobs:
         id: audit
         run: |
           echo "Running security audit..."
-          bun audit --audit-level high > audit-results.txt 2>&1 || true
-
-          if grep -q "vulnerabilities found" audit-results.txt; then
+          # Run audit with --no-color to avoid ANSI escape codes
+          bun audit --audit-level high --no-color > audit-results.txt 2>&1 || true
+          
+          # Check for actual vulnerability patterns
+          if grep -E "(vulnerabilities|vulnerability)" audit-results.txt | grep -v "No vulnerabilities found"; then
             echo "vulnerabilities=true" >> $GITHUB_OUTPUT
             echo "Security vulnerabilities found:"
             cat audit-results.txt
           else
             echo "vulnerabilities=false" >> $GITHUB_OUTPUT
-            echo "No high-severity vulnerabilities found"
+            echo "✅ No high-severity vulnerabilities found"
+            # Show the clean results
+            cat audit-results.txt
           fi
 
       - name: Create security issue
@@ -172,10 +176,37 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Creating security issue with gh cli..."
-          AUDIT_RESULTS=$(cat audit-results.txt)
+          
+          # Clean up ANSI codes and format the results
+          AUDIT_RESULTS=$(cat audit-results.txt | sed 's/\x1b\[[0-9;]*m//g' | sed 's/\x1b\[0m//g')
+          
+          # Create a properly formatted issue
+          cat > issue-body.md << 'EOF'
+          ## Security Audit Results
+          
+          High-severity vulnerabilities have been detected in project dependencies.
+          
+          ### Audit Output
+          
+          ```
+          EOF
+          echo "$AUDIT_RESULTS" >> issue-body.md
+          cat >> issue-body.md << 'EOF'
+          ```
+          
+          ### Recommended Actions
+          1. Review the vulnerabilities listed above
+          2. Update affected packages to secure versions  
+          3. Run `bun audit` locally to verify fixes
+          4. Consider using `bun audit --fix` for automatic fixes
+          
+          ### Auto-Generated
+          This issue was automatically created by the dependency update workflow.
+          EOF
+          
           if ! gh issue create \
             --title "🚨 Security vulnerabilities detected in dependencies" \
-            --body "## Security Audit Results\\n\\nHigh-severity vulnerabilities have been detected in project dependencies.\\n\\n### Audit Output\\n\\n\`\`\`\\n$AUDIT_RESULTS\\n\`\`\`\\n\\n### Recommended Actions\\n1. Review the vulnerabilities listed above\\n2. Update affected packages to secure versions\\n3. Run \`bun audit\` locally to verify fixes\\n4. Consider using \`bun audit --fix\` for automatic fixes\\n\\n### Auto-Generated\\nThis issue was automatically created by the dependency update workflow." 2>&1; then
+            --body-file issue-body.md 2>&1; then
             echo "❌ Failed to create security issue. This may be due to insufficient permissions."
             echo "Please check manually: bun audit --audit-level high"
             echo "Audit results:"
