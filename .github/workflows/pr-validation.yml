@@ -129,6 +129,8 @@ jobs:
           if [ "$CORE_CHANGES" -gt 0 ] || [ "$INTERFACE_CHANGES" -gt 0 ]; then
             echo "needs_full_test=true" >> $GITHUB_OUTPUT
             echo "needs_arch_check=true" >> $GITHUB_OUTPUT
+          fi
+
   # Targeted testing based on changes
   targeted-tests:
     needs: impact-analysis
@@ -163,4 +165,3 @@ jobs:
           echo "Changes validated for:"
           echo "- Core components: ${{ needs.impact-analysis.outputs.core-changed }}"
           echo "- Interfaces: ${{ needs.impact-analysis.outputs.interfaces-changed }}"
-          fi
