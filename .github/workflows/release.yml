@@ -6,6 +6,7 @@ on:
       - 'v*'
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   # Build and Test for Release
@@ -43,7 +44,7 @@ jobs:
           tar -czf knowledge-agent-${{ github.ref_name }}.tar.gz -C release .
 
       - name: Upload release assets
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: knowledge-agent-${{ github.ref_name }}
           path: knowledge-agent-${{ github.ref_name }}.tar.gz
@@ -65,12 +66,12 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref_name }}
-          release_name: Knowledge Agent ${{ github.ref_name }}
+          name: Knowledge Agent ${{ github.ref_name }}
           body: |
             ## Changes in this Release
 
@@ -99,11 +100,8 @@ jobs:
           prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
 
       - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./knowledge-agent-${{ github.ref_name }}.tar.gz
-          asset_name: knowledge-agent-${{ github.ref_name }}.tar.gz
-          asset_content_type: application/gzip
+          files: ./knowledge-agent-${{ github.ref_name }}.tar.gz

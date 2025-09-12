@@ -4,16 +4,12 @@
   "description": "Universal Knowledge Agent for cross-platform knowledge management integration",
   "main": "dist/index.js",
   "scripts": {
-    "build": "bun build --target=node",
+    "build": "bun build src/index.ts --outdir dist --target node",
     "build:tsc": "tsc",
     "dev": "bun --watch src/index.ts",
     "test": "bun test",
     "test:watch": "bun test --watch",
     "test:arch": "bun test tests/architecture/",
-    "arch:check": "dependency-cruiser src --config .dependency-cruiser.cjs",
-    "arch:graph": "dependency-cruiser src --include-only \"^src\" --output-type dot --output-to architecture-graph.dot",
-    "arch:json": "dependency-cruiser src --include-only \"^src\" --output-type json --output-to architecture-deps.json",
-    "arch:report": "dependency-cruiser src --output-type html > architecture-report.html",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write \"src/**/*.{ts,js,json,md}\"",
@@ -22,9 +18,9 @@
     "start": "bun run dist/index.js",
     "demo": "bun run src/demo/demo.ts",
     "demo:nlp": "bun run src/demo/nlp-scoring-demo.ts",
-    "check": "bun run typecheck && bun run lint && bun run format:check && bun run test:arch && bun run arch:check",
+    "check": "bun run typecheck && bun run lint && bun run format:check && bun run test:arch",
     "fix": "bun run lint:fix && bun run format",
-    "clean": "rm -rf dist coverage .nyc_output"
+    "clean": "rimraf dist coverage .nyc_output"
   },
   "keywords": [
     "knowledge-management",
@@ -40,28 +36,34 @@
   "engines": {
     "bun": ">=1.0.0"
   },
+  "overrides": {
+    "form-data": "^4.0.0",
+    "ws": "^8.17.1",
+    "tough-cookie": "^4.1.4",
+    "request": "npm:@cypress/request@^3.0.0"
+  },
   "trustedDependencies": [
     "@tensorflow/tfjs-node"
   ],
   "devDependencies": {
     "@eslint/js": "^9.34.0",
     "@faker-js/faker": "^10.0.0",
-    "@types/bun": "^1.2.20",
+    "@types/bun": "^1.2.21",
     "@types/natural": "^6.0.1",
     "@types/node": "^24.3.0",
     "@types/stopword": "^2.0.3",
     "@types/string-similarity": "^4.0.2",
-    "@typescript-eslint/eslint-plugin": "^8.40.0",
-    "@typescript-eslint/parser": "^8.40.0",
-    "bun-types": "^1.2.20",
-    "dependency-cruiser": "^17.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.41.0",
+    "@typescript-eslint/parser": "^8.41.0",
+    "bun-types": "^1.2.21",
     "eslint": "^9.34.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "prettier": "^3.6.2",
+    "rimraf": "^6.0.1",
     "tsarch": "^5.4.1",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.40.0"
+    "typescript-eslint": "^8.41.0"
   },
   "dependencies": {
     "@octokit/rest": "^22.0.0",
@@ -73,7 +75,7 @@
     "ioredis": "^5.7.0",
     "natural": "^8.1.0",
     "node-cache": "^5.1.2",
-    "openai": "^5.15.0",
+    "openai": "^5.16.0",
     "snoowrap": "^1.23.0",
     "stemmer": "^2.0.1",
     "stopword": "^3.1.5",

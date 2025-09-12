@@ -3,159 +3,164 @@ name: Pull Request Validation
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+  statuses: write
 
 jobs:
-  # Quick validation checks
+  # Fast PR validation checks
   pr-validation:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
-    
+    timeout-minutes: 10
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-          
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-        
-      - name: PR title validation
+
+      - name: Setup Bun Environment
+        uses: ./.github/actions/setup-bun
+      - name: Validate PR title
         run: |
           PR_TITLE="${{ github.event.pull_request.title }}"
-          
-          # Check if title follows conventional commit format
-          if [[ ! "$PR_TITLE" =~ ^(feat|fix|docs|style|refactor|test|chore|ci|perf|build)(\(.+\))?: .+ ]]; then
+          echo "Validating PR title: $PR_TITLE"
+
+          if ! echo "$PR_TITLE" | grep -Eq '^(feat|fix|docs|style|refactor|test|chore|ci|perf|build)(\(.+\))?: .+'; then
             echo "❌ PR title does not follow conventional commit format"
-            echo "Expected format: type(scope): description"
+            echo "Expected: type(scope): description"
             echo "Examples: feat: add new feature, fix(core): resolve bug, docs: update README"
             exit 1
           else
             echo "✅ PR title follows conventional commit format"
           fi
-          
-      - name: Check for merge conflicts
+
+      - name: Check merge conflicts
         run: |
-          git fetch origin ${{ github.event.pull_request.base.ref }}
+          echo "Checking for merge conflicts..."
+          git fetch origin ${{ github.event.pull_request.base.ref }} --depth=50
+
           if git merge-tree $(git merge-base HEAD origin/${{ github.event.pull_request.base.ref }}) HEAD origin/${{ github.event.pull_request.base.ref }} | grep -q "<<<<<<< "; then
-            echo "❌ PR has merge conflicts"
+            echo "❌ PR has merge conflicts - please resolve them"
             exit 1
           else
             echo "✅ No merge conflicts detected"
           fi
-          
-      - name: Fast type check
-        run: bunx tsc --noEmit --skipLibCheck
-        
-      - name: Fast test run (critical tests only)
-        run: bun test tests/architecture/ --timeout 15000
-        
-  # Change impact analysis
-  change-analysis:
+
+      - name: Quick type check
+        run: |
+          echo "Running TypeScript type check..."
+          bunx tsc --noEmit --skipLibCheck
+
+      - name: Critical architecture tests
+        run: |
+          echo "Running critical architecture tests..."
+          bun test tests/architecture/ --timeout 15000
+
+      - name: PR size check
+        run: |
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD | wc -l)
+          ADDED_LINES=$(git diff --numstat origin/${{ github.event.pull_request.base.ref }}...HEAD | awk '{added+=$1} END {print added+0}')
+          DELETED_LINES=$(git diff --numstat origin/${{ github.event.pull_request.base.ref }}...HEAD | awk '{deleted+=$2} END {print deleted+0}')
+
+          echo "📊 PR Statistics:"
+          echo "- Files changed: $CHANGED_FILES"
+          echo "- Lines added: $ADDED_LINES"
+          echo "- Lines deleted: $DELETED_LINES"
+
+          if [ $CHANGED_FILES -gt 50 ] || [ $ADDED_LINES -gt 1000 ]; then
+            echo "⚠️ Large PR detected - consider breaking into smaller PRs"
+          else
+            echo "✅ PR size is reasonable"
+          fi
+
+  # Impact analysis and targeted testing
+  impact-analysis:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
-    
+    timeout-minutes: 10
+    outputs:
+      core-changed: ${{ steps.analyze.outputs.core-changed }}
+      interfaces-changed: ${{ steps.analyze.outputs.interfaces-changed }}
+      tests-required: ${{ steps.analyze.outputs.tests-required }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
-      - name: Analyze changed files
-        id: changes
+
+      - name: Analyze changes
+        id: analyze
         run: |
-          echo "Analyzing changes in PR..."
-          
-          # Get list of changed files
-          git fetch origin ${{ github.event.pull_request.base.ref }}
+          echo "🔍 Analyzing change impact..."
+          git fetch origin ${{ github.event.pull_request.base.ref }} --depth=50
+
           CHANGED_FILES=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD)
-          
           echo "Changed files:"
           echo "$CHANGED_FILES"
-          
-          # Analyze impact
+
+          # Categorize changes
           CORE_CHANGES=$(echo "$CHANGED_FILES" | grep -c "^src/core/" || echo "0")
           INTERFACE_CHANGES=$(echo "$CHANGED_FILES" | grep -c "^src/interfaces/" || echo "0")
           TEST_CHANGES=$(echo "$CHANGED_FILES" | grep -c "^tests/" || echo "0")
           DOC_CHANGES=$(echo "$CHANGED_FILES" | grep -c "\.md$\|^docs/" || echo "0")
           CONFIG_CHANGES=$(echo "$CHANGED_FILES" | grep -c "package\.json\|tsconfig\.json\|eslint\.config\.js" || echo "0")
-          
-          echo "core_changes=$CORE_CHANGES" >> $GITHUB_OUTPUT
-          echo "interface_changes=$INTERFACE_CHANGES" >> $GITHUB_OUTPUT
-          echo "test_changes=$TEST_CHANGES" >> $GITHUB_OUTPUT
-          echo "doc_changes=$DOC_CHANGES" >> $GITHUB_OUTPUT
-          echo "config_changes=$CONFIG_CHANGES" >> $GITHUB_OUTPUT
-          
+
+          # Set outputs
+          echo "core-changed=$([ $CORE_CHANGES -gt 0 ] && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
+          echo "interfaces-changed=$([ $INTERFACE_CHANGES -gt 0 ] && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
+          echo "tests-required=$([ $CORE_CHANGES -gt 0 ] || [ $INTERFACE_CHANGES -gt 0 ] && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
+
+          # Print summary
+          echo "📊 Change Summary:"
+          echo "- Core changes: $CORE_CHANGES files"
+          echo "- Interface changes: $INTERFACE_CHANGES files"
+          echo "- Test changes: $TEST_CHANGES files"
+          echo "- Documentation changes: $DOC_CHANGES files"
+          echo "- Configuration changes: $CONFIG_CHANGES files"
+
           # Determine required checks
           if [ "$CORE_CHANGES" -gt 0 ] || [ "$INTERFACE_CHANGES" -gt 0 ]; then
             echo "needs_full_test=true" >> $GITHUB_OUTPUT
             echo "needs_arch_check=true" >> $GITHUB_OUTPUT
-          else
-            echo "needs_full_test=false" >> $GITHUB_OUTPUT
-            echo "needs_arch_check=false" >> $GITHUB_OUTPUT
-          fi
-          
-      - name: Comment change summary
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { core_changes, interface_changes, test_changes, doc_changes, config_changes } = ${{ steps.changes.outputs }};
-            
-            const impact = [];
-            if (core_changes > 0) impact.push(`🔧 Core logic changes: ${core_changes} files`);
-            if (interface_changes > 0) impact.push(`🔌 Interface changes: ${interface_changes} files`);
-            if (test_changes > 0) impact.push(`🧪 Test changes: ${test_changes} files`);
-            if (doc_changes > 0) impact.push(`📚 Documentation changes: ${doc_changes} files`);
-            if (config_changes > 0) impact.push(`⚙️ Configuration changes: ${config_changes} files`);
-            
-            const body = `## Change Impact Analysis
-            
-            ${impact.length > 0 ? impact.join('\n') : '📝 Minor changes detected'}
-            
-            ### Required Validations
-            ${core_changes > 0 || interface_changes > 0 ? '- ✅ Full test suite will run\n- ✅ Architecture compliance check required' : '- ⚡ Fast validation only'}
-            
-            *This analysis helps determine the appropriate level of testing for your changes.*`;
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body
-            });
-            
-  # Size and complexity check
-  size-check:
+  # Targeted testing based on changes
+  targeted-tests:
+    needs: impact-analysis
+    if: needs.impact-analysis.outputs.tests-required == 'true'
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
-    
+    timeout-minutes: 15
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          
-      - name: Check PR size
+
+      - name: Setup Bun Environment
+        uses: ./.github/actions/setup-bun
+
+      - name: Run targeted tests
         run: |
-          git fetch origin ${{ github.event.pull_request.base.ref }}
-          
-          # Count changes
-          ADDITIONS=$(git diff --shortstat origin/${{ github.event.pull_request.base.ref }}...HEAD | grep -o '[0-9]\+ insertion' | grep -o '[0-9]\+' || echo "0")
-          DELETIONS=$(git diff --shortstat origin/${{ github.event.pull_request.base.ref }}...HEAD | grep -o '[0-9]\+ deletion' | grep -o '[0-9]\+' || echo "0")
-          FILES_CHANGED=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD | wc -l)
-          
-          echo "Changes: +$ADDITIONS -$DELETIONS lines in $FILES_CHANGED files"
-          
-          # Size warnings
-          if [ "$ADDITIONS" -gt 1000 ] || [ "$FILES_CHANGED" -gt 20 ]; then
-            echo "⚠️ Large PR detected: Consider breaking into smaller PRs"
-            echo "::warning::Large PR with $ADDITIONS additions in $FILES_CHANGED files"
-          elif [ "$ADDITIONS" -gt 500 ] || [ "$FILES_CHANGED" -gt 10 ]; then
-            echo "📊 Medium-sized PR: Review carefully"
-          else
-            echo "✅ Small PR: Good size for review"
+          echo "🎯 Running targeted tests based on changes..."
+
+          if [[ "${{ needs.impact-analysis.outputs.core-changed }}" == "true" ]]; then
+            echo "Running core tests..."
+            bun test tests/unit/core/ --timeout 20000
+          fi
+
+          if [[ "${{ needs.impact-analysis.outputs.interfaces-changed }}" == "true" ]]; then
+            echo "Running interface compliance tests..."
+            bun test tests/architecture/ --timeout 15000
+          fi
+
+      - name: Test summary
+        run: |
+          echo "✅ Targeted testing completed successfully"
+          echo "Changes validated for:"
+          echo "- Core components: ${{ needs.impact-analysis.outputs.core-changed }}"
+          echo "- Interfaces: ${{ needs.impact-analysis.outputs.interfaces-changed }}"
           fi

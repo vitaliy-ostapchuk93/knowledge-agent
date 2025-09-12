@@ -1,0 +1,65 @@
+name: 'Setup Bun Environment'
+description: 'Set up Bun with caching and dependency installation'
+inputs:
+  bun-version:
+    description: 'Bun version to use'
+    required: false
+    default: '1.2.20'
+  install-dependencies:
+    description: 'Whether to install dependencies'
+    required: false
+    default: 'true'
+  frozen-lockfile:
+    description: 'Use frozen lockfile for installation'
+    required: false
+    default: 'true'
+
+outputs:
+  cache-hit:
+    description: 'Whether dependencies were restored from cache'
+    value: ${{ steps.cache.outputs.cache-hit }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: ${{ inputs.bun-version }}
+
+    - name: Get Bun cache directory
+      id: bun-cache-dir
+      shell: bash
+      run: |
+        echo "dir=$(bun pm cache)" >> $GITHUB_OUTPUT
+
+    - name: Setup Bun cache
+      id: cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ steps.bun-cache-dir.outputs.dir }}
+          node_modules
+        key: ${{ runner.os }}-bun-${{ inputs.bun-version }}-${{ hashFiles('**/bun.lock', '**/package.json') }}
+        restore-keys: |
+          ${{ runner.os }}-bun-${{ inputs.bun-version }}-
+          ${{ runner.os }}-bun-
+
+    - name: Install dependencies
+      if: inputs.install-dependencies == 'true'
+      shell: bash
+      run: |
+        if [[ "${{ inputs.frozen-lockfile }}" == "true" ]]; then
+          bun install --frozen-lockfile
+        else
+          bun install
+        fi
+
+    - name: Verify installation
+      if: inputs.install-dependencies == 'true'
+      shell: bash
+      run: |
+        echo "✅ Dependencies installed successfully"
+        bun --version
+        echo "Node modules:"
+        ls -la node_modules | head -5 || true

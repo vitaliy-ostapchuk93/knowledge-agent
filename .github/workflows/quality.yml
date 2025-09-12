@@ -8,44 +8,58 @@ on:
   schedule:
     # Run weekly on Sundays at 2 AM UTC
     - cron: '0 2 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
 
 jobs:
-  # Static Analysis and Linting
-  static-analysis:
+  # Fast quality checks
+  quality-gate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - name: Setup Bun Environment
+        uses: ./.github/actions/setup-bun
 
       - name: ESLint analysis
-        run: bun run lint
+        run: |
+          echo "Running ESLint analysis..."
+          bun run lint --max-warnings 0
 
       - name: TypeScript strict checking
-        run: bunx tsc --noEmit --strict
+        run: |
+          echo "Running strict TypeScript compilation..."
+          bunx tsc --noEmit --strict
 
-      - name: Check formatting
-        run: bun run format:check
+      - name: Format check
+        run: |
+          echo "Checking code formatting..."
+          bun run format:check
 
       - name: Unused exports check
-        run: bunx ts-unused-exports tsconfig.json --excludePathsFromReport="src/test-utils;tests/"
+        run: |
+          echo "Checking for unused exports..."
+          bunx ts-unused-exports tsconfig.json --excludePathsFromReport="src/test-utils;tests/" || echo "⚠️ Unused exports detected"
         continue-on-error: true
 
-  # Dependency Analysis
-  dependency-analysis:
+  # Security and dependency analysis
+  security-analysis:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup Bun Environment
+        uses: ./.github/actions/setup-bun
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1

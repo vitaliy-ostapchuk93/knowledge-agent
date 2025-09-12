@@ -5,6 +5,7 @@
 
 import { logger } from '@/utils/logger.ts';
 import { DomainTaxonomyManager } from '@/core/domain-taxonomy.ts';
+import type { TaxonomyTerm } from '@/types/taxonomy.ts';
 
 // Initialize taxonomy manager (optional for enhanced capabilities)
 let taxonomyManager: DomainTaxonomyManager | null = null;
@@ -511,7 +512,7 @@ export function getAllTechnicalTerms(): string[] {
       const learnedTerms = taxonomyManager
         .getTermsForDomain('programming')
         .concat(taxonomyManager.getTermsForDomain('data-science'))
-        .map((term: any) => term.value);
+        .map((term: TaxonomyTerm) => term.term);
       return [...new Set([...staticTerms, ...learnedTerms])];
     } catch (error) {
       logger.debug('Failed to get learned terms, using static only:', error);
@@ -574,7 +575,7 @@ export function detectTechnicalTerms(content: string, tokens?: string[]): string
         techDomains.forEach(domain => {
           const domainTerms = taxonomyManager!
             .getTermsForDomain(domain.domain)
-            .map((term: any) => term.value);
+            .map((term: TaxonomyTerm) => term.term);
           technicalTerms.push(...domainTerms);
         });
 
