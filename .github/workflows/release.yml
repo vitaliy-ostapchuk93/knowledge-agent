@@ -65,7 +65,7 @@ jobs:
         with:
           name: knowledge-agent-${{ github.ref_name }}
 
-      - name: Create Release
+      - name: Create Release with Assets
         id: create_release
         uses: softprops/action-gh-release@v2
         env:
@@ -99,10 +99,4 @@ jobs:
             See [README.md](README.md) for full documentation.
           draft: false
           prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
-
-      - name: Upload Release Asset
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
           files: ./knowledge-agent-${{ github.ref_name }}.tar.gz
