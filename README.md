@@ -19,6 +19,10 @@
 
 The Universal Knowledge Agent is an intelligent knowledge discovery and synthesis system that automatically curates and summarizes relevant content from multiple sources, designed to enhance personal knowledge management workflows.
 
+## 🚀 Quick Start
+
+Get started with the Universal Knowledge Agent in minutes!
+
 **Our mission** is to empower knowledge workers and researchers by creating an intelligent agent that seamlessly integrates external knowledge sources with personal knowledge management systems, automatically discovering and synthesizing relevant documentation, tutorials, and expert content to create dense, interconnected summaries that enhance personal knowledge graphs and accelerate learning.
 
 ## ✨ Key Features
