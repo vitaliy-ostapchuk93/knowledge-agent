@@ -89,7 +89,12 @@ jobs:
               bun test tests/unit/ --coverage --coverage-reporter=lcov
               ;;
             "integration")
-              bun test tests/integration/ --timeout 30000
+              if ls tests/integration/*.test.ts 1> /dev/null 2>&1; then
+                echo "Running integration tests..."
+                bun test tests/integration/ --timeout 30000
+              else
+                echo "No integration tests found, skipping."
+              fi
               ;;
             "architecture")
               bun test tests/architecture/ --timeout 15000
