@@ -29,10 +29,10 @@ jobs:
         run: |
           BRANCH_NAME="${{ github.head_ref }}"
           echo "Checking branch name: $BRANCH_NAME"
-          
+
           # Define valid branch prefixes
           VALID_PREFIXES="feature/ bugfix/ hotfix/ chore/ docs/ test/ refactor/"
-          
+
           # Check if branch follows naming convention
           VALID_BRANCH=false
           for prefix in $VALID_PREFIXES; do
@@ -41,7 +41,7 @@ jobs:
               break
             fi
           done
-          
+
           if [[ $VALID_BRANCH == false ]]; then
             echo "❌ Invalid branch name: $BRANCH_NAME"
             echo "Branch name must start with one of: $VALID_PREFIXES"
@@ -52,17 +52,17 @@ jobs:
             echo "  - docs/improve-readme"
             exit 1
           fi
-          
+
           echo "✅ Branch name follows convention: $BRANCH_NAME"
 
       - name: Validate PR title
         run: |
           PR_TITLE="${{ github.event.pull_request.title }}"
           echo "Checking PR title: $PR_TITLE"
-          
+
           # Define valid PR title prefixes (Conventional Commits)
           VALID_TYPES="feat:|fix:|docs:|style:|refactor:|test:|chore:|perf:|ci:|build:|revert:"
-          
+
           # Check if title follows conventional commits
           VALID_TITLE=false
           for type in $VALID_TYPES; do
@@ -71,7 +71,7 @@ jobs:
               break
             fi
           done
-          
+
           if [[ $VALID_TITLE == false ]]; then
             echo "❌ Invalid PR title: $PR_TITLE"
             echo "PR title must follow Conventional Commits format:"
@@ -82,13 +82,13 @@ jobs:
             echo "  - chore: update project dependencies"
             exit 1
           fi
-          
+
           echo "✅ PR title follows conventional commits: $PR_TITLE"
 
       - name: Check PR description
         run: |
           PR_BODY="${{ github.event.pull_request.body }}"
-          
+
           if [[ -z "$PR_BODY" || ${#PR_BODY} -lt 20 ]]; then
             echo "❌ PR description is too short or missing"
             echo "Please provide a meaningful description that includes:"
@@ -97,7 +97,7 @@ jobs:
             echo "  - How to test the changes"
             exit 1
           fi
-          
+
           echo "✅ PR has adequate description"
 
       - name: Check for breaking changes
@@ -106,7 +106,7 @@ jobs:
           BREAKING_INDICATORS=("BREAKING CHANGE" "breaking change" "breaking:" "BREAKING:")
           PR_BODY="${{ github.event.pull_request.body }}"
           PR_TITLE="${{ github.event.pull_request.title }}"
-          
+
           HAS_BREAKING=false
           for indicator in "${BREAKING_INDICATORS[@]}"; do
             if [[ "$PR_BODY" == *"$indicator"* || "$PR_TITLE" == *"$indicator"* ]]; then
@@ -114,7 +114,7 @@ jobs:
               break
             fi
           done
-          
+
           if [[ $HAS_BREAKING == true ]]; then
             echo "⚠️ Breaking changes detected in PR"
             echo "Please ensure:"
@@ -128,19 +128,19 @@ jobs:
       - name: Run quality checks
         run: |
           echo "🔍 Running quality checks..."
-          
+
           # Type checking
           echo "Checking TypeScript compilation..."
           bun run typecheck
-          
+
           # Linting
           echo "Running ESLint..."
           bun run lint
-          
+
           # Code formatting
           echo "Checking code formatting..."
           bun run format:check
-          
+
           echo "✅ All quality checks passed"
 
       - name: Run tests
@@ -160,7 +160,7 @@ jobs:
           # Check if PR can be cleanly merged
           git checkout main
           git pull origin main
-          
+
           # Simulate merge
           if ! git merge --no-commit --no-ff ${{ github.head_ref }}; then
             echo "❌ Merge conflicts detected"
@@ -168,7 +168,7 @@ jobs:
             git merge --abort
             exit 1
           fi
-          
+
           # Abort the merge simulation
           git merge --abort 2>/dev/null || true
           echo "✅ No merge conflicts detected"
