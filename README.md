@@ -211,10 +211,12 @@ The project includes comprehensive GitHub Actions workflows for automated buildi
   - Weekly scheduled quality audits
 
 - **📦 Dependency Management** (`.github/workflows/dependency-updates.yml`)
-  - Automated dependency updates (weekly)
-  - Security audit monitoring
-  - Pull request creation for updates
-  - Compatibility testing after updates
+  - Automated dependency updates (weekly scheduled + manual dispatch)
+  - Smart update types: patch, minor, or major versions
+  - Comprehensive testing and TypeScript validation after updates
+  - Branch creation with detailed change summaries
+  - Graceful handling of GitHub Actions PR limitations with manual guidance
+  - Integrated security audit monitoring with vulnerability reporting
 
 - **✅ PR Validation** (`.github/workflows/pr-validation.yml`)
   - Conventional commit title validation
