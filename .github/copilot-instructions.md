@@ -27,12 +27,22 @@ This is a TypeScript-based Universal Knowledge Agent that follows clean architec
 - **Propose alternatives**: Suggest different approaches when appropriate
 - **Document decisions**: Explain reasoning behind architectural choices
 
-### 2. **Build & Test First Approach**
+### 2. **Git Workflow & Branch Protection**
+
+- **Feature branch workflow**: Always create feature branches for new work
+- **Descriptive branch names**: Use format `feature/description`, `fix/description`, `docs/description`
+- **GitHub Actions verification**: All branches must pass CI/CD checks before merging
+- **Never merge without PR**: All changes must go through pull request process
+- **Branch protection rules**: Main branch is protected and requires passing checks
+- **CI/CD pipeline verification**: Tests, linting, type checking must pass
+
+### 3. **Build & Test First Approach**
 
 - **Run tests before any changes**: `bun test`
 - **Continuous validation**: Test after every significant change
 - **Build verification**: `bunx tsc --noEmit` to ensure type safety
 - **Regular integration**: `bun run lint:fix && bun run format`
+- **GitHub Actions compliance**: Ensure all CI checks pass locally before pushing
 
 ### 3. **Test-Driven Development**
 
@@ -49,6 +59,24 @@ This is a TypeScript-based Universal Knowledge Agent that follows clean architec
 - **Domain-driven structure**: Group related functionality by business domain
 - **Interface segregation**: One interface per file with descriptive names
 - **Type organization**: Split types by domain and usage patterns
+
+### 5. **GitHub Actions & CI/CD Requirements**
+
+- **NEVER mark work as DONE until all GitHub Actions pass**
+- **Pre-commit validation**: Always run tests locally before pushing
+- **CI/CD pipeline compliance**: All quality gates must pass:
+  - `bun test` - All tests must pass
+  - `bunx tsc --noEmit` - TypeScript compilation check
+  - `bun run lint:fix` - Code linting verification
+  - `bun run format` - Code formatting check
+- **Pull Request requirements**:
+  - All CI checks must be green
+  - Branch must be up-to-date with main
+  - No merge until all GitHub Actions complete successfully
+- **Quality gate enforcement**: Main branch is protected and requires:
+  - Status checks to pass
+  - Up-to-date branches before merging
+  - All conversations resolved
 
 ## Architecture & Design Principles
 
@@ -484,11 +512,12 @@ bun run type-check                  # Detailed type checking
 4. **Test Continuously**: Build and test regularly, extend test coverage
 5. **File Separation**: Keep files small and focused on single responsibilities
 6. **Use Existing Interfaces**: Check existing interfaces before creating new ones
-7. **Quality Gates**: Ensure all quality checks pass before committing
-8. **Documentation**: Keep code self-documenting with clear interfaces and types
+7. **GitHub Actions First**: NEVER mark work as DONE until all GitHub Actions pass
+8. **Quality Gates**: Ensure all quality checks pass before committing
+9. **Documentation**: Keep code self-documenting with clear interfaces and types
 
 **Remember**: Collaboration and communication are as important as code quality. When uncertain, ask questions rather than making assumptions. The best solutions come from understanding the problem thoroughly.
 
-**When in doubt, prioritize: Understanding > Implementation > Optimization** 5. **Quality Gates**: Ensure all quality checks pass before committing 6. **Documentation**: Keep code self-documenting with clear interfaces and types
+**When in doubt, prioritize: Understanding > Implementation > Optimization**
 
-**When in doubt, prioritize code maintainability, test coverage, and architectural consistency.**
+**Critical**: No work is considered complete until all GitHub Actions pass successfully.
