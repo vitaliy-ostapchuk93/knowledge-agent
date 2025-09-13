@@ -12,8 +12,8 @@
 
 [![CI/CD Pipeline](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/ci.yml)
 [![Quality](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/quality.yml)
+[![Dependencies](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/dependency-updates.yml/badge.svg?branch=main)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/dependency-updates.yml)
 [![Security](https://img.shields.io/badge/Security-A%2B-green.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent)
-[![Dependency Updates](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/dependency-updates.yml/badge.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/dependency-updates.yml)
 
 [**📥 Download Latest Release**](https://github.com/vitaliy-ostapchuk93/knowledge-agent/releases/latest) | [📖 Documentation](docs/) | [💬 Discussions](https://github.com/vitaliy-ostapchuk93/knowledge-agent/discussions)
 
