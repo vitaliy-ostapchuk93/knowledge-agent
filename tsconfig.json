@@ -33,9 +33,12 @@
       "@/cache/*": ["src/cache/*"],
       "@/discovery/*": ["src/discovery/*"],
       "@/events/*": ["src/events/*"],
-      "@/tests/*": ["tests/*"]
+      "@/data/*": ["src/data/*"],
+      "@/scripts/*": ["src/scripts/*"],
+      "@/tests/*": ["tests/*"],
+      "@/assets/*": ["assets/*"]
     }
   },
-  "include": ["src/**/*", "tests/**/*", "*.ts", "*.js"],
+  "include": ["src/**/*", "tests/**/*", "assets/**/*", "*.ts", "*.js"],
   "exclude": ["node_modules", "dist"]
 }
