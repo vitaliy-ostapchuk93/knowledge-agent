@@ -86,9 +86,10 @@ jobs:
           echo "✅ PR title follows conventional commits: $PR_TITLE"
 
       - name: Check PR description
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          PR_BODY="${{ github.event.pull_request.body }}"
-
+          # Only check length and presence, do not print or eval PR_BODY
           if [[ -z "$PR_BODY" || ${#PR_BODY} -lt 20 ]]; then
             echo "❌ PR description is too short or missing"
             echo "Please provide a meaningful description that includes:"
@@ -98,14 +99,15 @@ jobs:
             exit 1
           fi
 
-          echo "✅ PR has adequate description"
+          echo "✅ PR has adequate description (${#PR_BODY} characters)"
 
       - name: Check for breaking changes
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           # Look for breaking changes indicators
           BREAKING_INDICATORS=("BREAKING CHANGE" "breaking change" "breaking:" "BREAKING:")
-          PR_BODY="${{ github.event.pull_request.body }}"
-          PR_TITLE="${{ github.event.pull_request.title }}"
 
           HAS_BREAKING=false
           for indicator in "${BREAKING_INDICATORS[@]}"; do
