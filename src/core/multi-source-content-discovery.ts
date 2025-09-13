@@ -1,6 +1,8 @@
 /**
  * Multi-Source Content Discovery Implementation
- * Coordinates discovery across multiple sources with quality assessment and aggregation
+ *
+ * Core business logic for coordinating discovery across multiple sources with quality assessment and aggregation.
+ * This domain service orchestrates knowledge discovery from various content sources using configurable strategies.
  */
 
 import {
@@ -9,6 +11,7 @@ import {
   SearchOptions,
   ContentSource,
   DiscoveredContent,
+  ContentType,
 } from '@/types';
 import {
   IMultiSourceDiscovery,
@@ -292,9 +295,10 @@ export class MultiSourceContentDiscovery implements IMultiSourceDiscovery {
     // Round-robin selection
     const maxItems = Math.max(...Array.from(sourceItems.values()).map(arr => arr.length));
     for (let i = 0; i < maxItems; i++) {
-      for (const [_source, sourceItemList] of sourceItems) {
+      for (const sourceItemList of sourceItems.values()) {
         if (i < sourceItemList.length) {
-          const { sourceWeight: _sourceWeight, ...item } = sourceItemList[i];
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { sourceWeight, ...item } = sourceItemList[i];
           result.push(item);
         }
       }
@@ -319,7 +323,7 @@ export class MultiSourceContentDiscovery implements IMultiSourceDiscovery {
     for (const item of sortedItems) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { sourceWeight, ...cleanItem } = item;
-      
+
       // Prioritize items from new sources or content types
       const isNewSource = !seenSources.has(item.source);
       const isNewContentType = !seenContentTypes.has(item.metadata.contentType || 'unknown');
@@ -332,7 +336,7 @@ export class MultiSourceContentDiscovery implements IMultiSourceDiscovery {
     }
 
     return Promise.resolve(result);
-  }  /**
+  } /**
    * Remove duplicate items based on URL and content similarity
    */
   private removeDuplicates(
@@ -388,7 +392,7 @@ export class MultiSourceContentDiscovery implements IMultiSourceDiscovery {
 
     // Content type preference (documentation and tutorials score higher)
     const contentType = item.metadata.contentType;
-    if (contentType === 'documentation' || contentType === 'tutorial') {
+    if (contentType === ContentType.DOCUMENTATION || contentType === ContentType.TUTORIAL) {
       score += 0.1;
     }
 
