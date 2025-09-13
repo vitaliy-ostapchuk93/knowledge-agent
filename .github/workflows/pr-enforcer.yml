@@ -1,4 +1,4 @@
-name: PR Checklist Enforcer
+name: PR Format Validation
 
 on:
   pull_request:
@@ -11,8 +11,8 @@ permissions:
   checks: write
 
 jobs:
-  # Enforce PR requirements
-  pr-requirements:
+  # Validate PR format and requirements
+  pr-format-validation:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -125,35 +125,11 @@ jobs:
             echo "✅ No breaking changes detected"
           fi
 
-      - name: Run quality checks
+      - name: Quality checks status
         run: |
-          echo "🔍 Running quality checks..."
-
-          # Type checking
-          echo "Checking TypeScript compilation..."
-          bun run typecheck
-
-          # Linting
-          echo "Running ESLint..."
-          bun run lint
-
-          # Code formatting
-          echo "Checking code formatting..."
-          bun run format:check
-
-          echo "✅ All quality checks passed"
-
-      - name: Run tests
-        run: |
-          echo "🧪 Running test suite..."
-          bun test
-          echo "✅ All tests passed"
-
-      - name: Run architecture tests
-        run: |
-          echo "🏗️ Running architecture compliance tests..."
-          bun run test:arch
-          echo "✅ Architecture compliance verified"
+          echo "ℹ️  Quality checks are handled by the CI/CD Pipeline workflow"
+          echo "📋 This workflow focuses on PR-specific validation only"
+          echo "✅ PR format and requirements validated"
 
       - name: Check for merge conflicts
         run: |
@@ -179,13 +155,12 @@ jobs:
 
       - name: PR Summary
         run: |
-          echo "## ✅ PR Validation Summary"
+          echo "## ✅ PR Format Validation Summary"
           echo "- ✅ Branch name follows convention"
           echo "- ✅ PR title follows conventional commits"
           echo "- ✅ PR has adequate description"
-          echo "- ✅ Quality checks passed (lint, format, typecheck)"
-          echo "- ✅ All tests passed"
-          echo "- ✅ Architecture compliance verified"
-          echo "- ✅ No merge conflicts"
+          echo "- ✅ No breaking changes without proper marking"
+          echo "- ✅ No merge conflicts detected"
           echo ""
-          echo "This PR is ready for review! 🚀"
+          echo "📋 Code quality validation handled by CI/CD Pipeline"
+          echo "🚀 PR format requirements satisfied!"
