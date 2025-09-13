@@ -45,7 +45,7 @@ jobs:
   # Parallel build and test jobs
   build:
     needs: validate
-    if: needs.validate.outputs.should-skip != 'true'
+    if: always() && needs.validate.result == 'success' && needs.validate.outputs.should-skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -68,7 +68,7 @@ jobs:
 
   test:
     needs: validate
-    if: needs.validate.outputs.should-skip != 'true'
+    if: always() && needs.validate.result == 'success' && needs.validate.outputs.should-skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
@@ -119,6 +119,7 @@ jobs:
   # Combined validation job
   quality-checks:
     needs: [build, test]
+    if: always() && (needs.build.result == 'success' || needs.test.result == 'success')
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -158,8 +159,27 @@ jobs:
     steps:
       - name: Check CI status
         run: |
-          if [[ "${{ needs.validate.result }}" != "success" ]] ||
-             [[ "${{ needs.build.result }}" != "success" ]] ||
+          echo "Job Results:"
+          echo "  validate: ${{ needs.validate.result }}"
+          echo "  build: ${{ needs.build.result }}"
+          echo "  test: ${{ needs.test.result }}"
+          echo "  quality-checks: ${{ needs.quality-checks.result }}"
+
+          # Check if validation passed
+          if [[ "${{ needs.validate.result }}" != "success" ]]; then
+            echo "❌ Validation failed"
+            exit 1
+          fi
+
+          # Check if jobs were skipped due to duplicate action detection
+          if [[ "${{ needs.validate.outputs.should-skip }}" == "true" ]]; then
+            echo "ℹ️ Jobs were skipped due to duplicate detection - this is OK"
+            echo "✅ CI pipeline completed (skipped)"
+            exit 0
+          fi
+
+          # Check required jobs completed successfully
+          if [[ "${{ needs.build.result }}" != "success" ]] ||
              [[ "${{ needs.test.result }}" != "success" ]] ||
              [[ "${{ needs.quality-checks.result }}" != "success" ]]; then
             echo "❌ CI pipeline failed"
