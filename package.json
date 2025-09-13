@@ -43,7 +43,8 @@
     "form-data": "^4.0.0",
     "ws": "^8.17.1",
     "tough-cookie": "^4.1.4",
-    "request": "npm:@cypress/request@^3.0.0"
+    "request": "npm:@cypress/request@^3.0.0",
+    "tmp": "^0.2.4"
   },
   "trustedDependencies": [
     "@tensorflow/tfjs-node"

@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Git compatibility issues with semantic-release resolved
 - Release workflow authentication and token management streamlined
+- Security vulnerability in tmp package (<=0.2.3) resolved by dependency override
 
 ## [0.2.0] - 2024-09-13
 
