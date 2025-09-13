@@ -127,6 +127,35 @@ jobs:
             echo "✅ No breaking changes detected"
           fi
 
+      - name: Check changelog updates
+        run: |
+          echo "Checking if CHANGELOG.md has been updated..."
+
+          # Get list of changed files in this PR
+          CHANGED_FILES=$(git diff --name-only origin/main...origin/${{ github.head_ref }})
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          # Check if CHANGELOG.md is in the changed files
+          if echo "$CHANGED_FILES" | grep -q "CHANGELOG.md"; then
+            echo "✅ CHANGELOG.md has been updated"
+            echo "ℹ️  Remember to:"
+            echo "   - Use semantic versioning (vX.Y.Z)"
+            echo "   - Follow Keep a Changelog format"
+            echo "   - Include meaningful descriptions of changes"
+            echo "   - Organize by Added, Changed, Deprecated, Removed, Fixed, Security"
+          else
+            echo "⚠️  CHANGELOG.md not updated"
+            echo "Please update CHANGELOG.md to document your changes:"
+            echo "   1. Add a new entry under [Unreleased] section"
+            echo "   2. Describe what was added, changed, fixed, etc."
+            echo "   3. Be as detailed or concise as you prefer"
+            echo "   4. Semantic-release will handle versioning automatically"
+            echo ""
+            echo "The changelog helps users and maintainers understand what changed!"
+            exit 1
+          fi
+
       - name: Quality checks status
         run: |
           echo "ℹ️  Quality checks are handled by the CI/CD Pipeline workflow"
@@ -161,6 +190,7 @@ jobs:
           echo "- ✅ Branch name follows convention"
           echo "- ✅ PR title follows conventional commits"
           echo "- ✅ PR has adequate description"
+          echo "- ✅ CHANGELOG.md has been updated"
           echo "- ✅ No breaking changes without proper marking"
           echo "- ✅ No merge conflicts detected"
           echo ""

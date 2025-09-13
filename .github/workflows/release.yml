@@ -1,102 +1,46 @@
-name: Release Build
+name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
-  release:
-    types: [published]
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
   contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
 
 jobs:
-  # Build and Test for Release
-  release-build:
+  # Only run on main branch after CI passes
+  release:
     runs-on: ubuntu-latest
-
+    if: github.ref == 'refs/heads/main'
+    
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Setup Bun Environment
-        uses: ./.github/actions/setup-bun
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: TypeScript type checking
-        run: bunx tsc --noEmit --skipLibCheck
-
-      - name: Run all tests
-        run: bun test
-
-      - name: Build for production
+      - name: Build project
         run: bun run build
 
-      - name: Create release archive
-        run: |
-          mkdir -p release
-          cp -r dist/ release/
-          cp package.json release/
-          cp README.md release/
-          cp LICENSE release/
-          tar -czf knowledge-agent-${{ github.ref_name }}.tar.gz -C release .
+      - name: Run tests
+        run: bun test
 
-      - name: Upload release assets
-        uses: actions/upload-artifact@v4
-        with:
-          name: knowledge-agent-${{ github.ref_name }}
-          path: knowledge-agent-${{ github.ref_name }}.tar.gz
-
-  # Create GitHub Release
-  create-release:
-    runs-on: ubuntu-latest
-    needs: release-build
-    if: startsWith(github.ref, 'refs/tags/')
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: knowledge-agent-${{ github.ref_name }}
-
-      - name: Create Release with Assets
-        id: create_release
-        uses: softprops/action-gh-release@v2
+      - name: Release
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: Knowledge Agent ${{ github.ref_name }}
-          body: |
-            ## Changes in this Release
-
-            - Universal Knowledge Agent implementation
-            - Clean architecture with TypeScript
-            - Comprehensive test coverage
-            - Multi-platform content discovery
-            - AI-powered knowledge processing
-
-            ## Installation
-
-            ```bash
-            # Download and extract
-            tar -xzf knowledge-agent-${{ github.ref_name }}.tar.gz
-            cd knowledge-agent
-
-            # Install dependencies
-            bun install
-
-            # Run demo
-            bun run demo
-            ```
-
-            See [README.md](README.md) for full documentation.
-          draft: false
-          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
-          files: ./knowledge-agent-${{ github.ref_name }}.tar.gz
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: bunx semantic-release
