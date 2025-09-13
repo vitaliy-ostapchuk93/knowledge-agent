@@ -13,6 +13,7 @@
 [![CI/CD Pipeline](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/ci.yml)
 [![Quality](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/quality.yml)
 [![Dependencies](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/dependency-updates.yml/badge.svg?branch=main)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/actions/workflows/dependency-updates.yml)
+[![Release](https://img.shields.io/github/v/release/vitaliy-ostapchuk93/knowledge-agent?include_prereleases&label=Release)](https://github.com/vitaliy-ostapchuk93/knowledge-agent/releases/latest)
 [![Security](https://img.shields.io/badge/Security-A%2B-green.svg)](https://github.com/vitaliy-ostapchuk93/knowledge-agent)
 
 [**📥 Download Latest Release**](https://github.com/vitaliy-ostapchuk93/knowledge-agent/releases/latest) | [📖 Documentation](docs/) | [💬 Discussions](https://github.com/vitaliy-ostapchuk93/knowledge-agent/discussions)
