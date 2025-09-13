@@ -1,6 +1,6 @@
 {
   "name": "universal-knowledge-agent",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Universal Knowledge Agent for cross-platform knowledge management integration",
   "main": "dist/index.js",
   "scripts": {
