@@ -118,16 +118,16 @@ jobs:
           git checkout -b "$BRANCH"
           git add package.json bun.lock
           git commit -m "chore: update dependencies (${{ github.event.inputs.update_type || 'minor' }})"
-          
+
           # Push with error handling
           if ! git push origin "$BRANCH" 2>&1; then
             echo "❌ Failed to push branch. This may be due to insufficient permissions."
             echo "Please ensure the GITHUB_TOKEN has write access to contents and pull requests."
             exit 1
           fi
-          
+
           echo "✅ Successfully pushed dependency updates to branch: $BRANCH"
-          
+
           # Try to create PR, but don't fail if it doesn't work (GitHub Actions limitation)
           echo "Attempting to create pull request with gh cli..."
           if gh pr create \
@@ -141,28 +141,26 @@ jobs:
             echo "📝 Dependency updates have been pushed to branch: $BRANCH"
             echo "💡 You can manually create a PR from this branch if needed"
             echo "🔗 Branch URL: https://github.com/${{ github.repository }}/tree/$BRANCH"
-            
+
             # Add workflow summary
             cat >> $GITHUB_STEP_SUMMARY << EOF
           ## 🔄 Dependency Updates Completed
-          
-          ✅ **Branch Created**: \`$BRANCH\`  
-          ✅ **Dependencies Updated**: ${{ github.event.inputs.update_type || 'minor' }} versions  
-          ✅ **Tests Passed**: All tests are passing  
-          ✅ **TypeScript**: Compilation successful  
-          
+
+          ✅ **Branch Created**: \`$BRANCH\`
+          ✅ **Dependencies Updated**: ${{ github.event.inputs.update_type || 'minor' }} versions
+          ✅ **Tests Passed**: All tests are passing
+          ✅ **TypeScript**: Compilation successful
+
           ### 📝 Manual Action Required
           Due to GitHub Actions security limitations, the pull request could not be created automatically.
-          
+
           **Next Steps:**
           1. [View the branch](${{ github.server_url }}/${{ github.repository }}/tree/$BRANCH)
           2. [Create a pull request manually](${{ github.server_url }}/${{ github.repository }}/compare/main...$BRANCH)
-          
+
           ### 📋 Updated Packages
           Check the \`package.json\` and \`bun.lock\` changes in the branch above.
           EOF
-          finually create a PR from this branch if needed"
-            echo "🔗 Branch URL: https://github.com/${{ github.repository }}/tree/$BRANCH"
           fi
 
   # Security Audit
@@ -185,7 +183,7 @@ jobs:
           echo "Running security audit..."
           # Run audit with --no-color to avoid ANSI escape codes
           bun audit --audit-level high --no-color > audit-results.txt 2>&1 || true
-          
+
           # Check for actual vulnerability patterns
           if grep -E "(vulnerabilities|vulnerability)" audit-results.txt | grep -v "No vulnerabilities found"; then
             echo "vulnerabilities=true" >> $GITHUB_OUTPUT
@@ -204,34 +202,34 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Creating security issue with gh cli..."
-          
+
           # Clean up ANSI codes and format the results
           AUDIT_RESULTS=$(cat audit-results.txt | sed 's/\x1b\[[0-9;]*m//g' | sed 's/\x1b\[0m//g')
-          
+
           # Create a properly formatted issue
           cat > issue-body.md << 'EOF'
           ## Security Audit Results
-          
+
           High-severity vulnerabilities have been detected in project dependencies.
-          
+
           ### Audit Output
-          
+
           ```
           EOF
           echo "$AUDIT_RESULTS" >> issue-body.md
           cat >> issue-body.md << 'EOF'
           ```
-          
+
           ### Recommended Actions
           1. Review the vulnerabilities listed above
-          2. Update affected packages to secure versions  
+          2. Update affected packages to secure versions
           3. Run `bun audit` locally to verify fixes
           4. Consider using `bun audit --fix` for automatic fixes
-          
+
           ### Auto-Generated
           This issue was automatically created by the dependency update workflow.
           EOF
-          
+
           if ! gh issue create \
             --title "🚨 Security vulnerabilities detected in dependencies" \
             --body-file issue-body.md 2>&1; then
