@@ -20,7 +20,10 @@
     "demo:nlp": "bun run src/demo/nlp-scoring-demo.ts",
     "check": "bun run typecheck && bun run lint && bun run format:check && bun run test:arch",
     "fix": "bun run lint:fix && bun run format",
-    "clean": "rimraf dist coverage .nyc_output"
+    "clean": "rimraf dist coverage .nyc_output",
+    "release": "semantic-release",
+    "release:dry": "semantic-release --dry-run",
+    "commit": "git-cz"
   },
   "keywords": [
     "knowledge-management",
@@ -40,7 +43,8 @@
     "form-data": "^4.0.0",
     "ws": "^8.17.1",
     "tough-cookie": "^4.1.4",
-    "request": "npm:@cypress/request@^3.0.0"
+    "request": "npm:@cypress/request@^3.0.0",
+    "tmp": "^0.2.4"
   },
   "trustedDependencies": [
     "@tensorflow/tfjs-node"
@@ -48,6 +52,11 @@
   "devDependencies": {
     "@eslint/js": "^9.35.0",
     "@faker-js/faker": "^10.0.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.6",
+    "@semantic-release/release-notes-generator": "^14.1.0",
     "@types/bun": "^1.2.21",
     "@types/natural": "^6.0.1",
     "@types/node": "^24.3.3",
@@ -56,11 +65,14 @@
     "@typescript-eslint/eslint-plugin": "^8.43.0",
     "@typescript-eslint/parser": "^8.43.0",
     "bun-types": "^1.2.21",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^9.35.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
+    "semantic-release": "^24.2.8",
     "tsarch": "^5.4.1",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.43.0"
@@ -81,5 +93,10 @@
     "stopword": "^3.1.5",
     "string-similarity": "^4.0.4",
     "youtube-sr": "^4.3.12"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
