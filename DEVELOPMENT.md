@@ -1,5 +1,19 @@
 # Development Workflow Guidelines
 
+## Quick Start
+
+```bash
+# Create feature branch
+git checkout -b feature/your-feature-name
+
+# Make changes, commit with conventional format
+git commit -m "feat: your change description"
+
+# Push and create PR
+git push origin feature/your-feature-name
+gh pr create --title "feat: your change description"
+```
+
 ## Branch Protection Strategy
 
 Since this is a private repository on GitHub Free, we implement workflow-based branch protection instead of GitHub's built-in branch protection rules.
@@ -11,7 +25,7 @@ All feature branches must follow this naming pattern:
 ### Required Prefixes
 
 - `feature/` - New features and enhancements
-- `bugfix/` - Bug fixes and patches  
+- `bugfix/` - Bug fixes and patches
 - `hotfix/` - Critical production fixes
 - `chore/` - Maintenance and tooling
 - `docs/` - Documentation updates
@@ -46,7 +60,7 @@ PR titles must follow [Conventional Commits](https://www.conventionalcommits.org
 Examples:
 feat: add user authentication system
 fix: resolve login timeout issue
-docs: update API documentation  
+docs: update API documentation
 chore: update project dependencies
 test: add integration test coverage
 refactor: extract content processor class
@@ -133,7 +147,7 @@ Every PR must pass:
 
 1. **Code Quality**
    - TypeScript compilation (`bun run typecheck`)
-   - ESLint checks (`bun run lint`)  
+   - ESLint checks (`bun run lint`)
    - Prettier formatting (`bun run format:check`)
 
 2. **Testing**
@@ -160,6 +174,7 @@ Every PR must pass:
 ### Warning System
 
 Direct pushes to `main` trigger:
+
 - Automatic issue creation
 - Commit details logging
 - Workflow violation alerts
@@ -173,7 +188,7 @@ Direct pushes to `main` trigger:
 # List all branches
 git branch -a
 
-# Switch to existing branch  
+# Switch to existing branch
 git checkout branch-name
 git switch branch-name
 
@@ -297,15 +312,18 @@ gh pr create --title "revert: undo problematic changes"
 ### Common Issues
 
 **"Branch name doesn't follow convention"**
+
 ```bash
 git branch -m old-name feature/new-descriptive-name
 ```
 
-**"PR title format invalid"**  
+**"PR title format invalid"**
+
 - Update PR title to use conventional commits format
 - Examples: `feat:`, `fix:`, `docs:`, `chore:`
 
 **"Merge conflicts detected"**
+
 ```bash
 git checkout your-branch
 git rebase main
@@ -315,6 +333,7 @@ git push --force-with-lease
 ```
 
 **"Quality checks failed"**
+
 ```bash
 bun run fix      # Fix lint and format issues
 bun run check    # Verify all issues resolved
