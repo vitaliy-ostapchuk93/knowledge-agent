@@ -11,6 +11,7 @@ import { compareTwoStrings } from 'string-similarity';
 import { removeStopwords, eng } from 'stopword';
 import compromise from 'compromise';
 import { stemmer } from 'stemmer';
+import { TECHNICAL_TERMS } from '@/utils/terms-config.ts';
 
 export interface KnowledgeLink {
   sourceId: string;
@@ -730,27 +731,68 @@ export class KnowledgeLinkingEngine {
   }
 
   /**
-   * Detect topic-subtopic hierarchy
+   * Detect topic-subtopic hierarchy using centralized technical terms
    */
   private detectTopicHierarchy(
     content1: DiscoveredContent,
     content2: DiscoveredContent
   ): KnowledgeLink | null {
-    // This would be more sophisticated in a real implementation
-    // For now, we'll use simple keyword matching
+    const title1 = content1.title.toLowerCase();
+    const title2 = content2.title.toLowerCase();
 
-    if (
-      content1.title.toLowerCase().includes('javascript') &&
-      content2.title.toLowerCase().includes('typescript')
-    ) {
-      return {
-        sourceId: content1.id,
-        targetId: content2.id,
-        linkType: 'hierarchy',
-        strength: 0.6,
-        reason: 'TypeScript extends JavaScript',
-        bidirectional: false,
-      };
+    // Define hierarchical relationships between technologies
+    const hierarchies = [
+      { parent: 'javascript', children: ['typescript', 'node', 'react', 'vue', 'angular'] },
+      { parent: 'web', children: ['html', 'css', 'javascript', 'react', 'vue', 'angular'] },
+      { parent: 'frontend', children: ['react', 'vue', 'angular', 'svelte'] },
+      { parent: 'backend', children: ['node', 'express', 'django', 'flask', 'spring'] },
+      { parent: 'python', children: ['django', 'flask', 'fastapi'] },
+      { parent: 'java', children: ['spring', 'hibernate', 'maven', 'gradle'] },
+      { parent: 'database', children: ['sql', 'mysql', 'postgresql', 'mongodb', 'redis'] },
+    ];
+
+    // Check for parent-child relationships
+    for (const hierarchy of hierarchies) {
+      const parentInTitle1 = title1.includes(hierarchy.parent);
+      const parentInTitle2 = title2.includes(hierarchy.parent);
+
+      for (const child of hierarchy.children) {
+        const childInTitle1 = title1.includes(child);
+        const childInTitle2 = title2.includes(child);
+
+        if ((parentInTitle1 && childInTitle2) || (parentInTitle2 && childInTitle1)) {
+          return {
+            sourceId: parentInTitle1 ? content1.id : content2.id,
+            targetId: parentInTitle1 ? content2.id : content1.id,
+            linkType: 'hierarchy',
+            strength: 0.7,
+            reason: `${child} is part of ${hierarchy.parent} ecosystem`,
+            bidirectional: false,
+          };
+        }
+      }
+    }
+
+    // Fallback to simple language relationship detection using centralized terms
+    const languages = TECHNICAL_TERMS.languages;
+    const lang1 = languages.find(lang => title1.includes(lang));
+    const lang2 = languages.find(lang => title2.includes(lang));
+
+    if (lang1 && lang2 && lang1 !== lang2) {
+      // Special case: TypeScript extends JavaScript
+      if (
+        (lang1 === 'javascript' && lang2 === 'typescript') ||
+        (lang1 === 'typescript' && lang2 === 'javascript')
+      ) {
+        return {
+          sourceId: lang1 === 'javascript' ? content1.id : content2.id,
+          targetId: lang1 === 'javascript' ? content2.id : content1.id,
+          linkType: 'hierarchy',
+          strength: 0.8,
+          reason: 'TypeScript extends JavaScript',
+          bidirectional: false,
+        };
+      }
     }
 
     return null;

@@ -4,6 +4,7 @@
  */
 
 import { logger } from '@/utils/logger.ts';
+import { TECHNICAL_TERMS, DOMAIN_CONFIG, isStopWord } from '@/utils/terms-config.ts';
 import type { ITaxonomyManager } from '@/interfaces/taxonomy-manager.ts';
 import type { TaxonomyTerm, TaxonomyDomain } from '@/types/taxonomy.ts';
 import type {
@@ -31,8 +32,8 @@ export class DomainTaxonomyManager implements ITaxonomyManager {
       minFrequency: 3,
       maxLearnedTerms: 1000,
       enableExternalValidation: true,
-      focusDomains: ['programming', 'data-science', 'design', 'business'],
-      excludeTerms: ['the', 'and', 'or', 'but', 'is', 'are', 'was', 'were'],
+      focusDomains: [...DOMAIN_CONFIG.focusDomains],
+      excludeTerms: [], // Use stopword library instead of hardcoded list
       ...config,
     };
 
@@ -278,27 +279,10 @@ export class DomainTaxonomyManager implements ITaxonomyManager {
   // Private helper methods
 
   private initializeStaticTerms(): void {
-    // Programming Languages
-    const languages = [
-      'javascript',
-      'typescript',
-      'python',
-      'java',
-      'csharp',
-      'cpp',
-      'rust',
-      'go',
-      'php',
-      'ruby',
-      'swift',
-      'kotlin',
-      'dart',
-      'scala',
-      'r',
-      'matlab',
-    ];
+    // Use centralized technical terms configuration directly (no more hardcoded filtering!)
 
-    languages.forEach(term => {
+    // Programming Languages - use ALL from centralized config
+    TECHNICAL_TERMS.languages.forEach(term => {
       this.staticTerms.set(term, {
         term,
         domain: 'programming',
@@ -310,28 +294,11 @@ export class DomainTaxonomyManager implements ITaxonomyManager {
       });
     });
 
-    // Frameworks
-    const frameworks = [
-      'react',
-      'vue',
-      'angular',
-      'svelte',
-      'node',
-      'express',
-      'fastapi',
-      'django',
-      'flask',
-      'spring',
-      'laravel',
-      'rails',
-      'next',
-      'nuxt',
-    ];
-
-    frameworks.forEach(term => {
+    // Frontend frameworks and libraries
+    TECHNICAL_TERMS.frontend.forEach(term => {
       this.staticTerms.set(term, {
         term,
-        domain: 'programming',
+        domain: 'web-development',
         category: 'framework',
         confidence: 1.0,
         source: 'static',
@@ -340,21 +307,21 @@ export class DomainTaxonomyManager implements ITaxonomyManager {
       });
     });
 
-    // Core concepts
-    const concepts = [
-      'api',
-      'database',
-      'algorithm',
-      'authentication',
-      'authorization',
-      'microservices',
-      'containerization',
-      'ci-cd',
-      'testing',
-      'debugging',
-    ];
+    // Backend technologies
+    TECHNICAL_TERMS.backend.forEach(term => {
+      this.staticTerms.set(term, {
+        term,
+        domain: 'programming',
+        category: 'backend',
+        confidence: 1.0,
+        source: 'static',
+        frequency: 0,
+        lastSeen: new Date(),
+      });
+    });
 
-    concepts.forEach(term => {
+    // Core concepts - use ALL from centralized config
+    TECHNICAL_TERMS.coreConcepts.forEach(term => {
       this.staticTerms.set(term, {
         term,
         domain: 'software-engineering',
@@ -365,42 +332,86 @@ export class DomainTaxonomyManager implements ITaxonomyManager {
         lastSeen: new Date(),
       });
     });
+
+    // Architecture patterns
+    TECHNICAL_TERMS.architecture.forEach(term => {
+      this.staticTerms.set(term, {
+        term,
+        domain: 'architecture',
+        category: 'pattern',
+        confidence: 1.0,
+        source: 'static',
+        frequency: 0,
+        lastSeen: new Date(),
+      });
+    });
+
+    // Development practices
+    TECHNICAL_TERMS.practices.forEach(term => {
+      this.staticTerms.set(term, {
+        term,
+        domain: 'software-engineering',
+        category: 'practice',
+        confidence: 1.0,
+        source: 'static',
+        frequency: 0,
+        lastSeen: new Date(),
+      });
+    });
+
+    // Data and storage technologies
+    TECHNICAL_TERMS.data.forEach(term => {
+      this.staticTerms.set(term, {
+        term,
+        domain: 'data-science',
+        category: 'storage',
+        confidence: 1.0,
+        source: 'static',
+        frequency: 0,
+        lastSeen: new Date(),
+      });
+    });
+
+    // Tools and utilities
+    TECHNICAL_TERMS.tools.forEach(term => {
+      this.staticTerms.set(term, {
+        term,
+        domain: 'programming',
+        category: 'tool',
+        confidence: 1.0,
+        source: 'static',
+        frequency: 0,
+        lastSeen: new Date(),
+      });
+    });
+
+    // File formats and protocols
+    TECHNICAL_TERMS.formats.forEach(term => {
+      this.staticTerms.set(term, {
+        term,
+        domain: 'programming',
+        category: 'format',
+        confidence: 1.0,
+        source: 'static',
+        frequency: 0,
+        lastSeen: new Date(),
+      });
+    });
   }
 
   private initializeDomains(): void {
-    const domains: TaxonomyDomain[] = [
-      {
-        name: 'programming',
-        description: 'Programming languages, frameworks, and tools',
-        categories: ['language', 'framework', 'library', 'tool'],
-        keywordPatterns: ['code', 'programming', 'development', 'syntax'],
-        confidenceThreshold: 0.7,
-      },
-      {
-        name: 'software-engineering',
-        description: 'Software engineering practices and methodologies',
-        categories: ['concept', 'methodology', 'practice', 'tool'],
-        keywordPatterns: ['software', 'engineering', 'architecture', 'design'],
-        confidenceThreshold: 0.6,
-      },
-      {
-        name: 'data-science',
-        description: 'Data analysis, machine learning, and statistics',
-        categories: ['analysis', 'modeling', 'visualization', 'statistics'],
-        keywordPatterns: ['data', 'analysis', 'machine learning', 'statistics'],
-        confidenceThreshold: 0.7,
-      },
-      {
-        name: 'web-development',
-        description: 'Web development technologies and practices',
-        categories: ['frontend', 'backend', 'fullstack', 'protocol'],
-        parentDomain: 'programming',
-        keywordPatterns: ['web', 'frontend', 'backend', 'browser'],
-        confidenceThreshold: 0.6,
-      },
-    ];
+    // Use centralized domain configuration (no more hardcoded domain definitions!)
+    Object.values(DOMAIN_CONFIG.domains).forEach(domainConfig => {
+      const domain: TaxonomyDomain = {
+        name: domainConfig.name,
+        description: domainConfig.description,
+        categories: [...domainConfig.categories],
+        keywordPatterns: [...domainConfig.keywordPatterns],
+        confidenceThreshold: domainConfig.confidenceThreshold,
+        // Type assertion needed since TypeScript can't infer optional properties in union types
+        ...('parentDomain' in domainConfig && { parentDomain: domainConfig.parentDomain }),
+      };
 
-    domains.forEach(domain => {
       this.domains.set(domain.name, domain);
     });
   }
@@ -456,25 +467,46 @@ export class DomainTaxonomyManager implements ITaxonomyManager {
     if (context.contentType === 'code') confidence += 0.3;
     if (context.platform === 'github') confidence += 0.1;
 
-    // Pattern-based analysis
-    if (term.match(/^[a-z]+js$/)) {
-      // ends with 'js'
+    // Enhanced pattern-based analysis using centralized terms
+    const termLower = term.toLowerCase();
+
+    // Check against centralized technical categories
+    if (TECHNICAL_TERMS.languages.includes(termLower)) {
+      confidence += 0.4;
+      domain = 'programming';
+      category = 'language';
+    } else if (TECHNICAL_TERMS.frontend.includes(termLower) || term.match(/^[a-z]+js$/)) {
       confidence += 0.3;
       domain = 'programming';
       category = 'framework';
-    }
-
-    if (term.includes('api') || term.includes('sdk')) {
+    } else if (
+      TECHNICAL_TERMS.tools.includes(termLower) ||
+      termLower.includes('api') ||
+      termLower.includes('sdk')
+    ) {
       confidence += 0.2;
       domain = 'programming';
       category = 'tool';
+    } else if (TECHNICAL_TERMS.coreConcepts.includes(termLower)) {
+      confidence += 0.3;
+      domain = 'programming';
+      category = 'concept';
+    } else if (TECHNICAL_TERMS.data.includes(termLower)) {
+      confidence += 0.3;
+      domain = 'data';
+      category = 'storage';
+    } else if (TECHNICAL_TERMS.architecture.includes(termLower)) {
+      confidence += 0.4;
+      domain = 'architecture';
+      category = 'pattern';
     }
 
     return { confidence, domain, category, relatedTerms };
   }
 
   private isExcludedTerm(term: string): boolean {
-    return (this.config.excludeTerms || []).includes(term.toLowerCase());
+    // Use stopword library + any custom excludeTerms from config
+    return isStopWord(term) || (this.config.excludeTerms || []).includes(term.toLowerCase());
   }
 
   private isKnownTerm(term: string): boolean {
@@ -482,55 +514,8 @@ export class DomainTaxonomyManager implements ITaxonomyManager {
   }
 
   private isStopWord(token: string): boolean {
-    const stopWords = new Set([
-      'the',
-      'and',
-      'or',
-      'but',
-      'in',
-      'on',
-      'at',
-      'to',
-      'for',
-      'of',
-      'with',
-      'by',
-      'from',
-      'up',
-      'about',
-      'into',
-      'through',
-      'during',
-      'before',
-      'after',
-      'above',
-      'below',
-      'between',
-      'among',
-      'this',
-      'that',
-      'these',
-      'those',
-      'is',
-      'are',
-      'was',
-      'were',
-      'be',
-      'been',
-      'being',
-      'have',
-      'has',
-      'had',
-      'do',
-      'does',
-      'did',
-      'will',
-      'would',
-      'could',
-      'should',
-    ]);
-
-    return stopWords.has(token.toLowerCase());
+    // Use centralized stopword detection from terms-config
+    return isStopWord(token);
   }
 }
 

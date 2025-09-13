@@ -17,10 +17,18 @@ import { WordTokenizer, SentimentAnalyzer, PorterStemmer as Stemmer } from 'natu
 import { removeStopwords, eng } from 'stopword';
 import compromise from 'compromise';
 import {
+  TECHNICAL_TERMS,
+  SENTIMENT_WORDS,
+  DIFFICULTY_TERMS,
   detectTechnicalTerms,
   // getDifficultyTerms,
   // assessContentComplexity,
 } from '@/utils/terms-config.ts';
+import {
+  enhancedSentiment,
+  enhancedTextAnalyzer,
+  enhancedLanguageProcessor,
+} from '@/utils/nlp-enhanced.ts';
 
 export class MockAIStrategy implements IProcessingStrategy {
   readonly strategyType = ProcessingStrategy.LOCAL;
@@ -76,17 +84,11 @@ export class MockAIStrategy implements IProcessingStrategy {
     await this.delay(200);
 
     try {
-      // Use natural sentiment analysis
-      const tokens = this.tokenizer.tokenize(content) || [];
-      const sentimentScore = this.sentimentAnalyzer.getSentiment(tokens);
-
-      // Convert numeric sentiment to categorical
-      let sentiment: 'positive' | 'neutral' | 'negative' = 'neutral';
-      if (sentimentScore > 0.1) sentiment = 'positive';
-      else if (sentimentScore < -0.1) sentiment = 'negative';
+      // Use enhanced sentiment analysis
+      const sentimentResult = enhancedSentiment.analyzeSentiment(content);
 
       const analysis: Analysis = {
-        sentiment,
+        sentiment: sentimentResult.sentiment,
         complexity: this.assessComplexity(content),
         topics: this.extractTags(content).slice(0, 5),
         keyEntities: this.extractEntities(content),
@@ -105,8 +107,8 @@ export class MockAIStrategy implements IProcessingStrategy {
    */
   private analyzeSimple(content: string): Analysis {
     const words = content.toLowerCase().split(/\s+/);
-    const positiveWords = ['good', 'great', 'excellent', 'best', 'effective', 'useful'];
-    const negativeWords = ['bad', 'poor', 'difficult', 'problem', 'issue', 'error'];
+    const positiveWords = SENTIMENT_WORDS.positive;
+    const negativeWords = SENTIMENT_WORDS.negative;
 
     const positiveCount = words.filter(w => positiveWords.includes(w)).length;
     const negativeCount = words.filter(w => negativeWords.includes(w)).length;
@@ -187,45 +189,93 @@ export class MockAIStrategy implements IProcessingStrategy {
       return meaningfulPoints.slice(0, 5);
     }
 
-    // Fallback: generate topic-based key points
+    // Fallback: generate topic-based key points using enhanced language detection
+    try {
+      const detectedLanguages = enhancedLanguageProcessor.detectProgrammingLanguages(content);
+      if (detectedLanguages.length > 0 && detectedLanguages[0].confidence > 0.6) {
+        const primaryLanguage = detectedLanguages[0].language.toLowerCase();
+        return this.generateLanguageSpecificKeyPoints(primaryLanguage);
+      }
+    } catch (error) {
+      logger.debug('Enhanced language detection failed in key points, using fallback:', error);
+    }
+
+    // Secondary fallback: use centralized terms detection
     const contentLower = content.toLowerCase();
     const fallbackPoints = [];
 
-    if (contentLower.includes('react')) {
-      fallbackPoints.push(
+    // Check for technologies from centralized configuration
+    const detectedTech = TECHNICAL_TERMS.languages.find((lang: string) =>
+      contentLower.includes(lang)
+    );
+
+    if (detectedTech) {
+      return this.generateLanguageSpecificKeyPoints(detectedTech);
+    }
+
+    // Generic fallback
+    fallbackPoints.push(
+      'Core concepts and fundamentals',
+      'Practical implementation examples',
+      'Best practices and conventions',
+      'Common patterns and solutions',
+      'Advanced techniques and optimization'
+    );
+
+    return fallbackPoints.slice(0, 5);
+  }
+
+  /**
+   * Generate language-specific key points
+   */
+  private generateLanguageSpecificKeyPoints(language: string): string[] {
+    const keyPointsMap: { [key: string]: string[] } = {
+      react: [
         'Understanding React component architecture',
         'Implementing state management patterns',
         'Optimizing component performance',
         'Managing component lifecycle',
-        'Best practices for React development'
-      );
-    } else if (contentLower.includes('typescript')) {
-      fallbackPoints.push(
+        'Best practices for React development',
+      ],
+      typescript: [
         'TypeScript type system fundamentals',
         'Advanced type definitions and interfaces',
         'Error handling and type safety',
         'Integration with existing JavaScript projects',
-        'Performance optimization techniques'
-      );
-    } else if (contentLower.includes('javascript')) {
-      fallbackPoints.push(
+        'Performance optimization techniques',
+      ],
+      javascript: [
         'Modern JavaScript language features',
         'Asynchronous programming patterns',
         'DOM manipulation and event handling',
         'Module system and code organization',
-        'Testing and debugging strategies'
-      );
-    } else {
-      fallbackPoints.push(
-        'Core concepts and fundamentals',
-        'Practical implementation examples',
-        'Best practices and conventions',
-        'Common patterns and solutions',
-        'Advanced techniques and optimization'
-      );
-    }
+        'Testing and debugging strategies',
+      ],
+      python: [
+        'Python syntax and language fundamentals',
+        'Object-oriented programming concepts',
+        'Data structures and algorithms',
+        'Library and framework integration',
+        'Testing and debugging methodologies',
+      ],
+      java: [
+        'Java programming fundamentals',
+        'Object-oriented design principles',
+        'Exception handling and error management',
+        'Memory management and performance',
+        'Enterprise development patterns',
+      ],
+    };
 
-    return fallbackPoints.slice(0, 5);
+    return (
+      keyPointsMap[language.toLowerCase()] || [
+        `${language} programming fundamentals`,
+        `${language} best practices and conventions`,
+        `${language} development patterns`,
+        `${language} optimization techniques`,
+        `${language} testing and debugging`,
+      ]
+    );
   }
 
   /**
@@ -236,50 +286,23 @@ export class MockAIStrategy implements IProcessingStrategy {
       // Use compromise.js for better entity and concept extraction
       const doc = compromise(content);
 
-      // Extract various types of meaningful terms
+      // Use enhanced topic extraction
+      const enhancedTopics = enhancedTextAnalyzer.extractTopics(content, 10);
+      const topicTerms = enhancedTopics.map(t => t.topic);
+
+      // Combine with traditional approach for backup
       const nouns = doc.nouns().out('array');
       const topics = doc.topics().out('array');
       const technologies = doc.match('#Technology').out('array');
 
-      // Use natural tokenizer and stopword removal
-      const tokens = this.tokenizer.tokenize(content.toLowerCase()) || [];
-      const filteredTokens = removeStopwords(tokens, eng);
-
-      // Count word frequencies
-      const frequency: { [key: string]: number } = {};
-      filteredTokens.forEach(word => {
-        if (word.length > 3) {
-          frequency[word] = (frequency[word] || 0) + 1;
-        }
-      });
-
-      // Combine NLP-extracted terms with frequency analysis
-      const nlpTerms = [...nouns, ...topics, ...technologies]
-        .map(term => term.toLowerCase())
-        .filter(term => term.length > 2);
-
       // Technical terms that should be prioritized
-      const techTerms = detectTechnicalTerms(content, filteredTokens);
+      const techTerms = detectTechnicalTerms(content);
 
-      // Combine and score all terms
-      const allTerms = [...nlpTerms, ...Object.keys(frequency)];
-      const scoredTerms = allTerms.map(term => ({
-        term,
-        score:
-          (frequency[term] || 0) +
-          (techTerms.includes(term) ? 2 : 0) +
-          (nlpTerms.includes(term) ? 1 : 0),
-      }));
+      // Combine all sources with enhanced topics prioritized
+      const allTerms = [...topicTerms, ...nouns, ...topics, ...technologies, ...techTerms];
 
-      // Return top scored unique terms
-      return [
-        ...new Set(
-          scoredTerms
-            .sort((a, b) => b.score - a.score)
-            .slice(0, 10)
-            .map(item => item.term)
-        ),
-      ].filter(term => term.length > 2);
+      // Remove duplicates and filter
+      return [...new Set(allTerms)].filter(term => term && term.length > 2).slice(0, 10);
     } catch (error) {
       logger.debug('Error in NLP tag extraction, falling back to simple method:', error);
       return this.extractTagsSimple(content);
@@ -349,26 +372,44 @@ export class MockAIStrategy implements IProcessingStrategy {
   }
 
   /**
-   * Extract code examples from content
+   * Extract code examples from content using enhanced language detection
    */
   private extractCodeExamples(content: string): CodeExample[] {
-    const codeBlocks = content.match(/```(\w+)?\n([\s\S]*?)```/g) || [];
+    try {
+      // Use enhanced code block extraction
+      const enhancedCodeBlocks = enhancedLanguageProcessor.extractCodeBlocks(content);
 
-    return codeBlocks
-      .map((block, index) => {
-        const lines = block.split('\n');
-        const firstLine = lines[0];
-        const language = firstLine.match(/```(\w+)/)?.[1] || 'text';
-        const code = lines.slice(1, -1).join('\n');
+      return enhancedCodeBlocks
+        .map((block, index) => ({
+          language: block.language,
+          code: block.code.trim(),
+          description: `${block.language} example ${index + 1} (confidence: ${Math.round(block.confidence * 100)}%)`,
+          runnable: ['javascript', 'typescript', 'python', 'java', 'react'].includes(
+            block.language
+          ),
+        }))
+        .slice(0, 5);
+    } catch (error) {
+      logger.debug('Enhanced code extraction failed, using fallback:', error);
 
-        return {
-          language,
-          code: code.trim(),
-          description: `Code example ${index + 1}`,
-          runnable: ['javascript', 'typescript', 'python'].includes(language),
-        };
-      })
-      .slice(0, 5);
+      // Fallback to simple extraction
+      const codeBlocks = content.match(/```(\w+)?\n([\s\S]*?)```/g) || [];
+      return codeBlocks
+        .map((block, index) => {
+          const lines = block.split('\n');
+          const firstLine = lines[0];
+          const language = firstLine.match(/```(\w+)/)?.[1] || 'text';
+          const code = lines.slice(1, -1).join('\n');
+
+          return {
+            language,
+            code: code.trim(),
+            description: `Code example ${index + 1}`,
+            runnable: ['javascript', 'typescript', 'python'].includes(language),
+          };
+        })
+        .slice(0, 5);
+    }
   }
 
   /**
@@ -412,28 +453,9 @@ export class MockAIStrategy implements IProcessingStrategy {
    * Assess content difficulty
    */
   private assessDifficulty(content: string): 'beginner' | 'intermediate' | 'advanced' {
-    const advancedTerms = [
-      'algorithm',
-      'optimization',
-      'architecture',
-      'scalability',
-      'concurrency',
-      'asynchronous',
-      'microservices',
-      'distributed',
-    ];
-
-    const intermediateTerms = [
-      'component',
-      'function',
-      'class',
-      'interface',
-      'pattern',
-      'api',
-      'database',
-      'framework',
-      'library',
-    ];
+    // Use centralized difficulty terms
+    const advancedTerms = DIFFICULTY_TERMS.advanced;
+    const intermediateTerms = DIFFICULTY_TERMS.intermediate;
 
     const lowerContent = content.toLowerCase();
     const advancedCount = advancedTerms.filter(term => lowerContent.includes(term)).length;
@@ -461,29 +483,32 @@ export class MockAIStrategy implements IProcessingStrategy {
    */
   private extractEntities(content: string): string[] {
     try {
-      // Use compromise.js for sophisticated entity extraction
-      const doc = compromise(content);
+      // Use enhanced topic extraction which includes entity categorization
+      const enhancedTopics = enhancedTextAnalyzer.extractTopics(content, 8);
+      const entityTerms = enhancedTopics
+        .filter(topic => topic.category !== 'concept') // Focus on entities, not general concepts
+        .map(topic => topic.topic);
 
-      // Extract different types of entities
+      // Fallback to compromise.js for additional entities
+      const doc = compromise(content);
       const people = doc.people().out('array');
       const places = doc.places().out('array');
       const organizations = doc.organizations().out('array');
-      const topics = doc.topics().out('array');
 
-      // Combine all entities
-      const allEntities = [...people, ...places, ...organizations, ...topics];
+      // Combine enhanced and traditional extraction
+      const allEntities = [...entityTerms, ...people, ...places, ...organizations];
 
       // Filter and clean entities
       const cleanEntities = allEntities
         .filter(entity => entity && entity.length > 2)
-        .filter(entity => entity.length < 50) // Remove very long matches
+        .filter(entity => entity.length < 50)
         .map(entity => entity.trim())
-        .filter(entity => !/^\d+$/.test(entity)) // Remove pure numbers
-        .filter(entity => !entity.includes('http')); // Remove URLs
-      // Remove duplicates and return top entities
+        .filter(entity => !/^\d+$/.test(entity))
+        .filter(entity => !entity.includes('http'));
+
       return [...new Set(cleanEntities)].slice(0, 8);
     } catch (error) {
-      logger.debug('Error in NLP entity extraction, falling back to simple method:', error);
+      logger.debug('Error in enhanced entity extraction, falling back to simple method:', error);
       return this.extractEntitiesSimple(content);
     }
   }
@@ -495,10 +520,12 @@ export class MockAIStrategy implements IProcessingStrategy {
     // Look for capitalized words that might be entities
     const capitalizedWords = content.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g) || [];
 
-    // Filter out common words
-    const commonWords = ['The', 'This', 'That', 'When', 'Where', 'How', 'Why', 'What'];
+    // Filter out stop words using stopword library
     const entities = capitalizedWords
-      .filter(word => !commonWords.includes(word))
+      .filter(word => {
+        const filtered = removeStopwords([word.toLowerCase()], eng);
+        return filtered.length > 0;
+      })
       .filter(word => word.length > 2);
 
     return [...new Set(entities)].slice(0, 8);
@@ -595,19 +622,60 @@ This comprehensive resource covers ${keyAreas} key areas across approximately ${
   }
 
   private extractTopicName(content: string): string {
-    // Extract title from first header or generate from content
+    // Extract title from first header
     const titleMatch = content.match(/^#\s+(.+)$/m);
     if (titleMatch) {
       return titleMatch[1].trim();
     }
 
-    // Fallback to extracting from common programming topics
+    try {
+      // Use enhanced programming language detection for more accurate topic identification
+      const detectedLanguages = enhancedLanguageProcessor.detectProgrammingLanguages(content);
+      if (detectedLanguages.length > 0 && detectedLanguages[0].confidence > 0.7) {
+        return `${detectedLanguages[0].language} development`;
+      }
+
+      // Use enhanced topic extraction for intelligent topic naming
+      const topics = enhancedTextAnalyzer.extractTopics(content, 3);
+      if (topics.length > 0) {
+        const primaryTopic = topics[0];
+
+        // Generate contextual topic name based on category
+        switch (primaryTopic.category) {
+          case 'technology':
+            return `${primaryTopic.topic} development`;
+          case 'concept':
+            return `${primaryTopic.topic} concepts`;
+          case 'organization':
+            return `${primaryTopic.topic} guide`;
+          case 'other':
+            return `${primaryTopic.topic} reference`;
+          default:
+            return primaryTopic.topic;
+        }
+      }
+    } catch (error) {
+      logger.debug('Enhanced topic name extraction failed, using fallback:', error);
+    }
+
+    // Fallback using centralized technical terms
     const contentLower = content.toLowerCase();
-    if (contentLower.includes('react')) return 'React development';
-    if (contentLower.includes('typescript')) return 'TypeScript programming';
-    if (contentLower.includes('javascript')) return 'JavaScript development';
-    if (contentLower.includes('node')) return 'Node.js development';
-    if (contentLower.includes('database')) return 'database design';
+
+    // Check languages from centralized config
+    const detectedLanguage = TECHNICAL_TERMS.languages.find((lang: string) =>
+      contentLower.includes(lang)
+    );
+    if (detectedLanguage) {
+      return `${detectedLanguage} development`;
+    }
+
+    // Check core concepts
+    const detectedConcept = TECHNICAL_TERMS.coreConcepts.find((concept: string) =>
+      contentLower.includes(concept)
+    );
+    if (detectedConcept) {
+      return `${detectedConcept} concepts`;
+    }
 
     return 'software development concepts';
   } /**

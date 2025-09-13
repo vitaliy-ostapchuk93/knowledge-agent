@@ -17,7 +17,16 @@ import { OpenAI } from 'openai';
 import { WordTokenizer, SentimentAnalyzer, PorterStemmer as Stemmer, TfIdf } from 'natural';
 import { removeStopwords, eng } from 'stopword';
 import compromise from 'compromise';
-import { /* detectTechnicalTerms, */ assessContentComplexity } from '@/utils/terms-config.ts';
+import {
+  TECHNICAL_TERMS,
+  TECHNICAL_PATTERNS,
+  /* detectTechnicalTerms, */ assessContentComplexity,
+} from '@/utils/terms-config.ts';
+import {
+  enhancedSentiment,
+  enhancedTextAnalyzer,
+  // enhancedLanguageProcessor,
+} from '@/utils/nlp-enhanced.ts';
 
 export class OpenAIStrategy implements IProcessingStrategy {
   readonly strategyType = ProcessingStrategy.CLOUD;
@@ -138,18 +147,25 @@ export class OpenAIStrategy implements IProcessingStrategy {
   }
 
   /**
-   * Enhanced NLP-based analysis fallback
+   * Enhanced NLP-based analysis fallback with multi-method sentiment analysis
    */
   private analyzeWithNLP(content: string): Analysis {
     try {
-      // Use natural sentiment analysis
-      const tokens = this.tokenizer.tokenize(content) || [];
-      const sentimentScore = this.sentimentAnalyzer.getSentiment(tokens);
+      // Use enhanced sentiment analysis for more accurate results
+      const sentimentResult = enhancedSentiment.analyzeSentiment(content);
 
-      // Convert numeric sentiment to categorical
+      // Convert enhanced sentiment result to expected format
       let sentiment: 'positive' | 'neutral' | 'negative' = 'neutral';
-      if (sentimentScore > 0.1) sentiment = 'positive';
-      else if (sentimentScore < -0.1) sentiment = 'negative';
+      if (sentimentResult.confidence > 0.6) {
+        // Only use high confidence results
+        sentiment = sentimentResult.sentiment;
+      } else {
+        // Fallback to natural sentiment analysis for low confidence
+        const tokens = this.tokenizer.tokenize(content) || [];
+        const sentimentScore = this.sentimentAnalyzer.getSentiment(tokens);
+        if (sentimentScore > 0.1) sentiment = 'positive';
+        else if (sentimentScore < -0.1) sentiment = 'negative';
+      }
 
       return {
         sentiment,
@@ -159,7 +175,7 @@ export class OpenAIStrategy implements IProcessingStrategy {
         readingLevel: this.calculateReadingLevel(content),
       };
     } catch (error) {
-      logger.debug('NLP analysis failed, using simple fallback:', error);
+      logger.debug('Enhanced NLP analysis failed, using simple fallback:', error);
       return {
         sentiment: 'neutral',
         complexity: 'medium',
@@ -352,14 +368,26 @@ Guidelines:
   }
 
   /**
-   * Enhanced topic extraction using NLP libraries
+   * Enhanced topic extraction using advanced NLP analysis with TF-IDF
    */
   private extractTopicsWithNLP(content: string): string[] {
     try {
-      // Use compromise.js for better entity and concept extraction
-      const doc = compromise(content);
+      // Use enhanced text analyzer for sophisticated topic extraction
+      const enhancedTopics = enhancedTextAnalyzer.extractTopics(content, 6);
 
-      // Extract various types of meaningful terms
+      if (enhancedTopics.length > 0) {
+        // Convert enhanced topics to simple string array, prioritizing high-confidence results
+        const topicStrings = enhancedTopics
+          .filter(topic => topic.relevance > 0.1) // Only include significant topics
+          .map(topic => topic.topic);
+
+        if (topicStrings.length >= 3) {
+          return topicStrings.slice(0, 5);
+        }
+      }
+
+      // Fallback to compromise.js extraction if enhanced method doesn't yield enough results
+      const doc = compromise(content);
       const nouns = doc.nouns().out('array');
       const topics = doc.topics().out('array');
       const technologies = doc.match('#Technology').out('array');
@@ -381,7 +409,7 @@ Guidelines:
         .map(term => term.toLowerCase())
         .filter(term => term.length > 2);
 
-      // Dynamic technical terms detection based on patterns and common tech keywords
+      // Dynamic technical terms detection
       const techTerms = this.detectTechnicalTerms(content, filteredTokens);
 
       // Combine and score all terms
@@ -394,7 +422,6 @@ Guidelines:
           (nlpTerms.includes(term) ? 1 : 0),
       }));
 
-      // Return top scored unique terms
       return [
         ...new Set(
           scoredTerms
@@ -404,39 +431,70 @@ Guidelines:
         ),
       ].filter(term => term.length > 2);
     } catch (error) {
-      logger.debug('Error in NLP topic extraction, falling back to simple method:', error);
+      logger.debug('Error in enhanced NLP topic extraction, falling back to simple method:', error);
       return this.extractSimpleTopics(content);
     }
   }
 
   /**
-   * Enhanced entity extraction using NLP libraries
+   * Enhanced entity extraction using advanced NLP analysis
    */
   private extractEntitiesWithNLP(content: string): string[] {
     try {
-      // Use compromise.js for sophisticated entity extraction
-      const doc = compromise(content);
+      // Use enhanced text analyzer for comprehensive entity extraction via topics
+      const enhancedTopics = enhancedTextAnalyzer.extractTopics(content, 10);
 
-      // Extract different types of entities
+      // Categorize enhanced topics into entities
+      const entityTypes = {
+        people: enhancedTopics.filter(t => t.category === 'person').map(t => t.topic),
+        organizations: enhancedTopics.filter(t => t.category === 'organization').map(t => t.topic),
+        technologies: enhancedTopics.filter(t => t.category === 'technology').map(t => t.topic),
+        concepts: enhancedTopics
+          .filter(t => t.category === 'concept')
+          .map(t => t.topic)
+          .slice(0, 3),
+      };
+
+      const allEntities = [
+        ...entityTypes.people,
+        ...entityTypes.organizations,
+        ...entityTypes.technologies,
+        ...entityTypes.concepts,
+      ];
+
+      // Filter and clean entities
+      const cleanEntities = allEntities
+        .filter(entity => entity && entity.length > 2)
+        .filter(entity => entity.length < 50)
+        .map(entity => entity.trim())
+        .filter(entity => !/^\d+$/.test(entity))
+        .filter(entity => !entity.includes('http'));
+
+      // If enhanced extraction yields good results, use them
+      if (cleanEntities.length >= 3) {
+        return [...new Set(cleanEntities)].slice(0, 8);
+      }
+
+      // Fallback to compromise.js if enhanced method doesn't yield enough results
+      const doc = compromise(content);
       const people = doc.people().out('array');
       const places = doc.places().out('array');
       const organizations = doc.organizations().out('array');
       const topics = doc.topics().out('array');
 
-      // Combine all entities
-      const allEntities = [...people, ...places, ...organizations, ...topics];
-
-      // Filter and clean entities
-      const cleanEntities = allEntities
+      const fallbackEntities = [...people, ...places, ...organizations, ...topics]
         .filter(entity => entity && entity.length > 2)
-        .filter(entity => entity.length < 50) // Remove very long matches
+        .filter(entity => entity.length < 50)
         .map(entity => entity.trim())
-        .filter(entity => !/^\d+$/.test(entity)) // Remove pure numbers
-        .filter(entity => !entity.includes('http')); // Remove URLs
-      // Remove duplicates and return top entities
-      return [...new Set(cleanEntities)].slice(0, 5);
+        .filter(entity => !/^\d+$/.test(entity))
+        .filter(entity => !entity.includes('http'));
+
+      return [...new Set(fallbackEntities)].slice(0, 5);
     } catch (error) {
-      logger.debug('Error in NLP entity extraction, falling back to simple method:', error);
+      logger.debug(
+        'Error in enhanced NLP entity extraction, falling back to simple method:',
+        error
+      );
       return [];
     }
   }
@@ -547,59 +605,19 @@ Guidelines:
   private detectTechnicalTerms(content: string, tokens: string[]): string[] {
     const lowerContent = content.toLowerCase();
 
-    // Base technical keywords that are commonly used
-    const baseTechTerms = [
-      'api',
-      'database',
-      'framework',
-      'library',
-      'service',
-      'component',
-      'function',
-      'class',
-      'interface',
-      'algorithm',
-      'performance',
-      'security',
-      'testing',
-      'deployment',
-      'authentication',
-      'optimization',
-      'pattern',
-    ];
+    // Use centralized technical terms from terms-config
+    const baseTechTerms = TECHNICAL_TERMS.coreConcepts;
+    const languages = TECHNICAL_TERMS.languages;
+    const tools = TECHNICAL_TERMS.tools;
+    const formats = TECHNICAL_TERMS.formats;
 
-    // Programming languages and technologies (detect from content)
-    const languages = [
-      'javascript',
-      'typescript',
-      'python',
-      'java',
-      'react',
-      'node',
-      'angular',
-      'vue',
-      'docker',
-      'kubernetes',
-      'aws',
-      'azure',
-      'mongodb',
-      'postgresql',
-      'redis',
-      'graphql',
-      'rest',
-      'html',
-      'css',
-      'sql',
-      'git',
-      'webpack',
-    ];
-
-    // File extensions and technical patterns
+    // Use centralized technical patterns instead of hardcoded ones
     const techPatterns = [
-      /\.(js|ts|py|java|cpp|cs|php|rb|go|rs|swift|kt)(?:\s|$)/gi,
-      /\b(?:npm|yarn|pip|composer|maven|gradle)\b/gi,
-      /\b(?:http|https|ftp|ssh|tcp|udp|ip)\b/gi,
-      /\b(?:json|xml|yaml|csv|html|css|sql)\b/gi,
+      ...TECHNICAL_PATTERNS.fileExtensions,
+      ...TECHNICAL_PATTERNS.packageManagers,
+      ...TECHNICAL_PATTERNS.protocols,
+      ...TECHNICAL_PATTERNS.configFormats,
+      ...TECHNICAL_PATTERNS.frameworks,
     ];
 
     const detectedTerms = new Set<string>();
@@ -618,6 +636,20 @@ Guidelines:
       }
     });
 
+    // Add tools that appear in content
+    tools.forEach(tool => {
+      if (lowerContent.includes(tool)) {
+        detectedTerms.add(tool);
+      }
+    });
+
+    // Add formats that appear in content
+    formats.forEach(format => {
+      if (lowerContent.includes(format)) {
+        detectedTerms.add(format);
+      }
+    });
+
     // Detect technical patterns
     techPatterns.forEach(pattern => {
       const matches = content.match(pattern);
@@ -631,20 +663,33 @@ Guidelines:
       }
     });
 
-    // Add frequently mentioned tokens that look technical
+    // Add frequently mentioned tokens that match technical terms from centralized config
     tokens.forEach(token => {
-      if (
-        token.length > 3 &&
-        (token.endsWith('js') ||
+      if (token.length > 3) {
+        // Check against all technical term categories
+        const isInLanguages = TECHNICAL_TERMS.languages.some(
+          (lang: string) => token.includes(lang) || lang.includes(token)
+        );
+        const isInConcepts = TECHNICAL_TERMS.coreConcepts.some(
+          (concept: string) => token.includes(concept) || concept.includes(token)
+        );
+        const isInTools = TECHNICAL_TERMS.tools.some(
+          (tool: string) => token.includes(tool) || tool.includes(tool)
+        );
+        const isInFormats = TECHNICAL_TERMS.formats.some(
+          (format: string) => token.includes(format) || format.includes(token)
+        );
+
+        // Also check for common technical suffixes/patterns
+        const hasTechPattern =
+          token.endsWith('js') ||
           token.endsWith('ts') ||
           token.includes('config') ||
-          token.includes('server') ||
-          token.includes('client') ||
-          token.includes('data') ||
-          token.includes('cache') ||
-          token.includes('async'))
-      ) {
-        detectedTerms.add(token);
+          token.includes('async');
+
+        if (isInLanguages || isInConcepts || isInTools || isInFormats || hasTechPattern) {
+          detectedTerms.add(token);
+        }
       }
     });
 

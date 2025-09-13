@@ -185,5 +185,5 @@ async function initializeAgent(): Promise<KnowledgeAgent> {
 
 // Run demo if called directly
 if (import.meta.main) {
-  runMultiQueryDemo().catch(console.error);
+  runMultiQueryDemo().catch(logger.error);
 }

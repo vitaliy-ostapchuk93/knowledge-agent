@@ -163,5 +163,5 @@ function createSampleDiscoveredContent() {
 
 // Run demo if called directly
 if (import.meta.main) {
-  runSimpleKnowledgeLinkingDemo().catch(console.error);
+  runSimpleKnowledgeLinkingDemo().catch(logger.error);
 }
