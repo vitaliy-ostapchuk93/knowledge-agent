@@ -94,6 +94,11 @@ docs/.vuepress/dist/
 knowledge-data/
 cached-content/
 
+# External data downloads (fetched by setup scripts)
+assets/external-data/
+assets/processed/
+assets/reports/
+
 # Debug files
 debug.log
 *.debug

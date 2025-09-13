@@ -18,6 +18,10 @@
     "start": "bun run dist/index.js",
     "demo": "bun run src/demo/demo.ts",
     "demo:nlp": "bun run src/demo/nlp-scoring-demo.ts",
+    "setup": "bun run src/scripts/setup-external-data.ts",
+    "setup:verbose": "bun run src/scripts/setup-external-data.ts --verbose",
+    "setup:force": "bun run src/scripts/setup-external-data.ts --force",
+    "postinstall": "bun run src/scripts/setup-external-data.ts --postinstall",
     "check": "bun run typecheck && bun run lint && bun run format:check && bun run test:arch",
     "fix": "bun run lint:fix && bun run format",
     "clean": "rimraf dist coverage .nyc_output",
@@ -92,6 +96,7 @@
     "stemmer": "^2.0.1",
     "stopword": "^3.1.5",
     "string-similarity": "^4.0.4",
+    "yaml": "^2.8.1",
     "youtube-sr": "^4.3.12"
   },
   "config": {

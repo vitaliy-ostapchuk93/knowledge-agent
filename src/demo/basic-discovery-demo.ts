@@ -139,5 +139,5 @@ async function initializeAgent(): Promise<KnowledgeAgent> {
 
 // Run demo if called directly
 if (import.meta.main) {
-  runBasicDiscoveryDemo().catch(console.error);
+  runBasicDiscoveryDemo().catch(logger.error);
 }

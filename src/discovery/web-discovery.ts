@@ -5,6 +5,7 @@
 
 import { DiscoveredContent, ContentSource } from '@/types/index.ts';
 import { logger } from '@/utils/logger.ts';
+import { removeStopwords, eng } from 'stopword';
 
 export interface WebDiscoveryOptions {
   maxResults?: number;
@@ -138,28 +139,20 @@ export class WebDiscovery {
   }
 
   private extractTopics(query: string): string[] {
-    // Extract key topics from the query
-    const commonWords = new Set([
-      'the',
-      'and',
-      'or',
-      'but',
-      'in',
-      'on',
-      'at',
-      'to',
-      'for',
-      'of',
-      'with',
-      'by',
-    ]);
+    // Extract key topics from the query using stopword library
     const words = query
       .split(/\s+/)
       .map(word => word.replace(/[^a-zA-Z0-9]/g, ''))
-      .filter(word => word.length > 2 && !commonWords.has(word.toLowerCase()))
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+      .filter(word => word.length > 2);
 
-    return words.slice(0, 3); // Return up to 3 main topics
+    // Use stopword library for better stop word removal
+    const filteredWords = removeStopwords(words, eng);
+
+    const topics = filteredWords.map(
+      word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    );
+
+    return topics.slice(0, 3); // Return up to 3 main topics
   }
 
   async getPopularContent(

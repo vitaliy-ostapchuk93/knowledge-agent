@@ -183,5 +183,5 @@ async function initializeAgent(): Promise<{
 
 // Run demo if called directly
 if (import.meta.main) {
-  runCacheDemo().catch(console.error);
+  runCacheDemo().catch(logger.error);
 }

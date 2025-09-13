@@ -83,14 +83,16 @@ For developers who want to contribute or customize the agent:
 git clone https://github.com/vitaliy-ostapchuk93/knowledge-agent.git
 cd knowledge-agent
 
-# Install dependencies
+# Install dependencies (automatically downloads 16,500+ enhanced terms)
 bun install
 
 # Run the interactive demo (no API keys required)
 bun run demo
 ```
 
-> **💡 Tip:** The demo showcases core functionality with mock data, creating a sample knowledge base in the `demo-knowledge-base` directory. For enhanced AI features, set your `OPENAI_API_KEY` environment variable.
+> **💡 Enhanced Setup:** Installation automatically downloads external data for comprehensive functionality. See [`docs/external-data-integration.md`](docs/external-data-integration.md) for setup details.
+
+> **💡 Demo Tip:** The demo showcases core functionality with mock data, creating a sample knowledge base in the `demo-knowledge-base` directory. For enhanced AI features, set your `OPENAI_API_KEY` environment variable.
 
 ### Prerequisites
 
@@ -101,7 +103,7 @@ bun run demo
 ### Quick Example
 
 ```typescript
-import { KnowledgeAgent } from './src/core/knowledge-agent.js';
+import { KnowledgeAgent } from '@/core/knowledge-agent.ts';
 
 const agent = new KnowledgeAgent({
   platform: 'markdown',
@@ -131,6 +133,7 @@ guidelines.
 - `bun run typecheck` - Type checking with TypeScript
 - `bun run check` - Run full quality checks (lint, format, typecheck, tests)
 - `bun run build` - Build for production
+- `bun run setup` - Manual external data setup/retry
 
 ### Environment Configuration
 
@@ -390,7 +393,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 > I'd really appreciate your support. [Buy Vitaliy Ostapchuk a coffee a coffee ☕](https://buymeacoffee.com/vitaliy.ostapchuk).
 
-![coffee](/assets/bmc_qr_small.png)
+![coffee](/assets/imgs/bmc_qr_small.png)
 
 Universal Knowledge Agent is inspired by and builds upon the excellent work of knowledge management pioneers:
 

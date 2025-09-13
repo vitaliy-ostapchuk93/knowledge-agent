@@ -103,7 +103,7 @@ if (import.meta.main) {
         process.exit(0);
       })
       .catch(error => {
-        console.error('Demo failed:', error);
+        logger.error('Demo failed:', error);
         process.exit(1);
       });
   } else {
@@ -114,7 +114,7 @@ if (import.meta.main) {
         process.exit(0);
       })
       .catch(error => {
-        console.error('Demos failed:', error);
+        logger.error('Demos failed:', error);
         process.exit(1);
       });
   }
