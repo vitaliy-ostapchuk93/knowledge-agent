@@ -101,14 +101,14 @@ console.log(`External data available: ${metadata.externalDataAvailable}`);
 
 ```bash
 # Download all external data sources
-bun run assets/scripts/fetch-all-data.ts
+bun run src/data/fetch-all-data.ts
 ```
 
 ### 2. Data Transformation
 
 ```bash
 # Convert external data to internal format
-bun run assets/scripts/transform-external-data.ts
+bun run src/data/transform-external-data.ts
 ```
 
 ### 3. Runtime Usage
@@ -175,6 +175,7 @@ bun install  # Automatically runs postinstall script
 ```
 
 The postinstall script:
+
 - Runs silently during `bun install`
 - Downloads external data sources automatically
 - Falls back gracefully if fetching fails
@@ -186,34 +187,37 @@ The postinstall script:
 ```bash
 # Manual setup commands
 bun run setup          # Retry external data download
-bun run setup:verbose  # Detailed progress information  
+bun run setup:verbose  # Detailed progress information
 bun run setup:force    # Force refresh existing data
 ```
 
 ### Setup Behavior
 
-| Scenario | Behavior | User Experience |
-|----------|----------|-----------------|
-| **Fresh Install** | Auto-downloads 16,500+ terms | Silent, seamless setup |
-| **Network Issues** | Falls back to 75 built-in terms | App works, reduced coverage |
-| **Existing Data** | Skips download, uses cached data | Instant setup |
-| **Force Refresh** | Re-downloads latest external data | Updated term coverage |
+| Scenario           | Behavior                          | User Experience             |
+| ------------------ | --------------------------------- | --------------------------- |
+| **Fresh Install**  | Auto-downloads 16,500+ terms      | Silent, seamless setup      |
+| **Network Issues** | Falls back to 75 built-in terms   | App works, reduced coverage |
+| **Existing Data**  | Skips download, uses cached data  | Instant setup               |
+| **Force Refresh**  | Re-downloads latest external data | Updated term coverage       |
 
 ### Troubleshooting Setup
 
 **Check External Data Status:**
+
 ```bash
 # View current external data status
 bun run setup:verbose
 ```
 
 **Common Issues:**
+
 - **Network restrictions**: Corporate firewalls may block external data fetching
 - **Proxy settings**: May need proxy configuration for external downloads
 - **Disk space**: Requires ~5MB for complete external data storage
 - **Permissions**: Write access needed for `assets/` directory
 
 **Fallback Indicators:**
+
 - Console message: "Using fallback terms (~75 terms)"
 - Reduced term count in API responses
 - Missing external data files in `assets/processed/`
