@@ -1,0 +1,103 @@
+name: Branch Protection
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  # Detect direct pushes to main and create warning issue
+  detect-direct-push:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check if push was from a merge
+        id: check-merge
+        run: |
+          # Check if this is a merge commit (has 2 parents)
+          if git cat-file -p HEAD | grep -q '^parent.*parent'; then
+            echo "is_merge=true" >> $GITHUB_OUTPUT
+            echo "This appears to be a merge commit (likely from PR merge)"
+          else
+            echo "is_merge=false" >> $GITHUB_OUTPUT
+            echo "This appears to be a direct push to main"
+          fi
+
+      - name: Get commit details
+        if: steps.check-merge.outputs.is_merge == 'false'
+        id: commit-info
+        run: |
+          echo "commit_sha=${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "commit_message<<EOF" >> $GITHUB_OUTPUT
+          git log -1 --pretty=format:"%s" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "commit_author=$(git log -1 --pretty=format:"%an")" >> $GITHUB_OUTPUT
+
+      - name: Create warning issue for direct push
+        if: steps.check-merge.outputs.is_merge == 'false'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          script: |
+            const issueBody = `
+            ## ⚠️ Direct Push to Main Branch Detected
+
+            A direct push to the \`main\` branch was detected, bypassing the recommended PR workflow.
+
+            ### Commit Details
+            - **SHA**: \`${{ steps.commit-info.outputs.commit_sha }}\`
+            - **Message**: "${{ steps.commit-info.outputs.commit_message }}"
+            - **Author**: ${{ steps.commit-info.outputs.commit_author }}
+            - **Timestamp**: ${{ github.event.head_commit.timestamp }}
+
+            ### Recommended Workflow
+            To maintain code quality and enable proper review:
+
+            1. **Create feature branches** for new work:
+               \`\`\`bash
+               git checkout -b feature/your-feature-name
+               \`\`\`
+
+            2. **Work on your branch** and commit changes:
+               \`\`\`bash
+               git add .
+               git commit -m "feat: your change description"
+               git push origin feature/your-feature-name
+               \`\`\`
+
+            3. **Create a Pull Request** for review:
+               \`\`\`bash
+               gh pr create --title "Your PR Title" --body "Description of changes"
+               \`\`\`
+
+            4. **Merge through GitHub** after review and checks pass
+
+            ### Next Steps
+            - Consider reverting this commit if it wasn't intentional
+            - Set up proper branch workflow for future changes
+            - Review the project's contributing guidelines
+
+            ---
+            *This issue was automatically created by the Branch Protection workflow*
+            `;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `⚠️ Direct Push to Main Branch - ${new Date().toISOString().split('T')[0]}`,
+              body: issueBody,
+              labels: ['workflow-violation', 'needs-review']
+            });
+
+            console.log('Warning issue created for direct push to main branch');

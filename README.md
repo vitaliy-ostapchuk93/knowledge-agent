@@ -114,6 +114,10 @@ console.log(result.summary);
 
 ## 💻 Development
 
+**📖 Development Workflow**: This project uses branch-based development with
+automated PR validation. See [DEVELOPMENT.md](DEVELOPMENT.md) for complete
+guidelines.
+
 ### Available Scripts
 
 - `bun dev` - Start development server with hot reload
