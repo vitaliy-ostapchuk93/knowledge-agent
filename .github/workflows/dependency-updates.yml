@@ -35,7 +35,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Setup Bun Environment
         uses: ./.github/actions/setup-bun
@@ -87,7 +87,7 @@ jobs:
       - name: Set git remote with token
         if: steps.outdated.outputs.outdated == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
 
@@ -104,7 +104,7 @@ jobs:
       - name: Create Pull Request
         if: steps.outdated.outputs.outdated == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           echo "Creating dependency update branch..."
           BRANCH="dependency-updates/${{ github.run_id }}"
